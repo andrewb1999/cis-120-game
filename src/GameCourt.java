@@ -9,7 +9,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * GameCourt
@@ -31,9 +30,11 @@ public class GameCourt extends JPanel {
     // Game constants
     private final int COURT_WIDTH = (int) (dim.getHeight()/1.5);
     private final int COURT_HEIGHT = (int) (dim.getHeight()/1.5);
+    private final int CENTER_X = COURT_WIDTH/2;
+    private final int CENTER_Y = COURT_HEIGHT/2;
     private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
     private static final int INTERVAL = 1;
-    private static final int CANNON_TIME_DECREASE = 50;
+    private static final int CANNON_TIME_DECREASE = 5;
     private static final int MIN_CANNON_INTERVAL = 100;
     private static final int SPEED_INCREASE_INTERVAL = 5000;
     private static final int INIT_CANNON_INTERVAL = 750;
@@ -45,11 +46,14 @@ public class GameCourt extends JPanel {
     // the state of the game logic
     private Ship ship;
     private Cannon cannon;
+    private CircleObj centerTest;
     private List<CannonBall> cannonBalls;
+    private List<CollectibleCircleObject> collectibles;
     private Timer cannonTimer;
     private int cannonInterval;
     private double shipSpeed;
     private double cannonballSpeed;
+    private int score;
 
 
     public enum OrbitDirection {
@@ -107,19 +111,31 @@ public class GameCourt extends JPanel {
      * (Re-)set the game to its initial state.
      */
     public void reset() {
-        int centerX = COURT_WIDTH/2 - COURT_WIDTH/32;
-        int centerY = COURT_HEIGHT/2 - COURT_WIDTH/32;
+
 
         cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/8, COURT_WIDTH/2, COURT_HEIGHT/2);
-        ship = new Ship(COURT_WIDTH, COURT_HEIGHT, centerX, centerY, Color.BLUE);
+        ship = new Ship(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y, Color.BLUE);
+        centerTest = new CircleObj(CENTER_X - 10, CENTER_Y - 10, 10, COURT_WIDTH, COURT_HEIGHT) {
+            @Override
+            public void draw(Graphics g) {
+                g.setColor(Color.BLACK);
+                g.fillOval(this.getPx(), this.getPy(), this.getWidth(), this.getHeight());
+            }
+        };
         cannonBalls = new LinkedList<>();
+        collectibles = new LinkedList<>();
+        for (int i = 0; i < 360; i += 10) {
+            if (i != 90)
+                collectibles.add(Coin.createCoin(ORBIT_RADIUS, i, COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y));
+        }
+        score = 0;
         cannonInterval = INIT_CANNON_INTERVAL;
         shipSpeed = INIT_SHIP_SPEED;
         cannonballSpeed = INIT_CANNONBALL_SPEED;
         cannonInterval = INIT_CANNON_INTERVAL;
         direction = OrbitDirection.CW;
         playing = true;
-        status.setText("Running...");
+        status.setText("Score: " + score);
         requestFocusInWindow();
     }
 
@@ -140,11 +156,22 @@ public class GameCourt extends JPanel {
 
                 if (c.intersects(ship)) {
                     playing = false;
-                    status.setText("You lose!");
+                    status.setText("You lose! Score: " + score);
                 }
             }
 
+            List<CollectibleCircleObject> toRemoveCollectible = new LinkedList<CollectibleCircleObject>();
+            for (CollectibleCircleObject c : collectibles) {
+                if (c.intersects(ship)) {
+                    c.modifyState(this);
+                    toRemoveCollectible.add(c);
+                }
+            }
+
+            collectibles.removeAll(toRemoveCollectible);
             cannonBalls.removeAll(toRemove);
+
+            status.setText("Score: " + score);
 
             // update the display
             repaint();
@@ -185,13 +212,25 @@ public class GameCourt extends JPanel {
         }
     }
 
+    public void incrementScore() {
+        score++;
+    }
+
+//    public int getScore() {
+//        return score;
+//    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        ship.draw(g);
+
+        for (CollectibleCircleObject c : collectibles)
+            c.draw(g);
         for (CannonBall c : cannonBalls)
             c.draw(g);
-        cannon.draw(g);
+//        cannon.draw(g);
+        centerTest.draw(g);
+        ship.draw(g);
     }
 
     @Override

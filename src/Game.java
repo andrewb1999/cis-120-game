@@ -22,10 +22,11 @@ public class Game implements Runnable {
         frame.setLayout(new BorderLayout());
 
         // Status panel
-//        final JPanel status_panel = new JPanel();
-//        frame.add(status_panel, BorderLayout.SOUTH);
-        final JLabel status = new JLabel("Running...");
-//        status_panel.add(status);
+        final JPanel status_panel = new JPanel();
+        frame.add(status_panel, BorderLayout.SOUTH);
+        final JLabel status = new JLabel("Score: " + 0);
+        status_panel.add(status);
+
 
         // Main playing area
         final JPanel game_panel = new JPanel();

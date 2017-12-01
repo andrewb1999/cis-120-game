@@ -14,6 +14,8 @@ public class Ship extends CircleObj {
     private double theta;
     private int centerX;
     private int centerY;
+    private int courtWidth;
+    private int courtHeight;
     private static final int RADIUS_FACTOR = 40;
     private static final int INIT_X_FACTOR = 2;
     private static final int INIT_Y_FACTOR = 8;
@@ -21,10 +23,12 @@ public class Ship extends CircleObj {
     private Color color;
 
     public Ship(int courtWidth, int courtHeight, int centerX, int centerY, Color color) {
-        super(courtWidth/INIT_X_FACTOR - (courtWidth * 2)/RADIUS_FACTOR,
-                courtHeight/INIT_Y_FACTOR - (courtWidth * 2)/RADIUS_FACTOR, courtWidth/RADIUS_FACTOR,
+        super(courtWidth/INIT_X_FACTOR - courtWidth/RADIUS_FACTOR,
+                courtHeight/INIT_Y_FACTOR - courtWidth/RADIUS_FACTOR, courtWidth/RADIUS_FACTOR,
                 courtWidth, courtHeight);
 
+        this.courtWidth = courtWidth;
+        this.courtHeight = courtHeight;
         this.centerX = centerX;
         this.centerY = centerY;
         theta = -Math.atan2(centerY - getPy(), centerX - getPx());
@@ -40,8 +44,8 @@ public class Ship extends CircleObj {
         double x = centerX + radius*Math.cos(theta);
         double y  = centerY + radius*Math.sin(theta);
 
-        this.setPx((int) x);
-        this.setPy((int) y);
+        this.setPx((int) x - courtWidth/RADIUS_FACTOR);
+        this.setPy((int) y - courtWidth/RADIUS_FACTOR);
     }
 
     @Override
