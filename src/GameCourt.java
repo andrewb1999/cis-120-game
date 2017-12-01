@@ -33,14 +33,14 @@ public class GameCourt extends JPanel {
     private final int COURT_HEIGHT = (int) (dim.getHeight()/1.5);
     private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
     private static final int INTERVAL = 1;
-    private static final int CANNON_TIME_DECREASE = 5;
-    private static final int MIN_CANNON_INTERVAL = 150;
+    private static final int CANNON_TIME_DECREASE = 50;
+    private static final int MIN_CANNON_INTERVAL = 100;
     private static final int SPEED_INCREASE_INTERVAL = 5000;
     private static final int INIT_CANNON_INTERVAL = 750;
-    private static final double INIT_SHIP_SPEED = 0.25;
-    private static final double INIT_CANNONBALL_SPEED = 2.0;
-    private static final double SHIP_SPEED_INCREASE = 0.025;
-    private static final double CANNONBALL_SPEED_INCREASE = 0.1;
+    private final double INIT_SHIP_SPEED = COURT_HEIGHT/5760.0;
+    private final double INIT_CANNONBALL_SPEED = COURT_HEIGHT/1080.0;
+    private final double SHIP_SPEED_INCREASE = COURT_HEIGHT/57600.0;
+    private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/14400.0;
 
     // the state of the game logic
     private Ship ship;
@@ -154,9 +154,14 @@ public class GameCourt extends JPanel {
     private void cannonTick() {
         if (playing) {
             double currentShipAngle = ship.getAngleInDegrees();
-            double expectedShipAngle = (ORBIT_RADIUS/cannonballSpeed) * shipSpeed;
-            double launchAngle = (Math.random() - 0.5) * 90 + currentShipAngle
-                    + direction.getDirection() * expectedShipAngle;
+            double expectedAdditionalShipAngle = (ORBIT_RADIUS/cannonballSpeed) * shipSpeed;
+            double launchAngle;
+            if (Math.random() > 0.5) {
+                launchAngle = (Math.random() - 0.5) * 45 + currentShipAngle
+                        + direction.getDirection() * expectedAdditionalShipAngle;
+            } else {
+                launchAngle = (Math.random() - 0.5) * 45 + currentShipAngle;
+            }
 
             cannonBalls.add(new CannonBall(COURT_WIDTH, COURT_HEIGHT, launchAngle));
             if (cannonInterval > MIN_CANNON_INTERVAL) {
