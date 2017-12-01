@@ -21,13 +21,7 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class GameCourt extends JPanel {
 
-    // the state of the game logic
-    private Ship ship;
-    private Cannon cannon;
-    private List<CannonBall> cannonBalls;
-    private int time;
-    private int timeBetweenShots;
-    private Timer cannonTimer;
+
 
     public boolean playing = false; // whether the game is running 
     private JLabel status; // Current status text, i.e. "Running..."
@@ -36,13 +30,26 @@ public class GameCourt extends JPanel {
     private Dimension dim = toolkit.getScreenSize();
 
     // Game constants
-    public final int COURT_WIDTH = (int) (dim.getHeight()/1.5);
-    public final int COURT_HEIGHT = (int) (dim.getHeight()/1.5);
-    public final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
+    private final int COURT_WIDTH = (int) (dim.getHeight()/1.5);
+    private final int COURT_HEIGHT = (int) (dim.getHeight()/1.5);
+    private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
+    private static final int INTERVAL = 1;
+    private final int CANNON_TIME_DECREASE = 5;
+    private final int MIN_CANNON_INTERVAL = 150;
+    private final int SPEED_INCREASE_INTERVAL = 5000;
+    private final int INIT_CANNON_INTERVAL = 750;
+    private final double INIT_SHIP_SPEED = 0.25;
+    private final double INIT_CANNONBALL_SPEED = 2.0;
 
-    // Update interval for timer, in milliseconds
-    public static final int INTERVAL = 1;
-    public int cannonInterval = 750;
+    // the state of the game logic
+    private Ship ship;
+    private Cannon cannon;
+    private List<CannonBall> cannonBalls;
+    private Timer cannonTimer;
+    private int cannonInterval;
+    private double shipSpeed;
+    private double cannonballSpeed;
+
 
     public enum OrbitDirection {
         CW (-1),
@@ -61,28 +68,19 @@ public class GameCourt extends JPanel {
     private OrbitDirection direction;
 
     public GameCourt(JLabel status) {
-        // creates border around the court area, JComponent method
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        cannonBalls = new LinkedList<CannonBall>();
-
-        // The timer is an object which triggers an action periodically with the given INTERVAL. We
-        // register an ActionListener with this timer, whose actionPerformed() method is called each
-        // time the timer triggers. We define a helper method called tick() that actually does
-        // everything that should be done in a single timestep.
         Timer timer = new Timer(INTERVAL, e -> tick());
-        timer.start(); // MAKE SURE TO START THE TIMER!
+        timer.start();
 
         cannonTimer = new Timer(cannonInterval, e -> cannonTick());
         cannonTimer.start();
 
-        // Enable keyboard focus on the court area.
-        // When this component has the keyboard focus, key events are handled by its key listener.
+        Timer speedIncreaseTimer = new Timer(SPEED_INCREASE_INTERVAL, e -> speedIncreaseTick());
+        speedIncreaseTimer.start();
+
         setFocusable(true);
 
-        // This key listener allows the square to move as long as an arrow key is pressed, by
-        // changing the square's velocity accordingly. (The tick method below actually moves the
-        // square.)
         addKeyListener(new KeyAdapter() {
             private boolean spaceIsPressed;
 
@@ -101,8 +99,6 @@ public class GameCourt extends JPanel {
             }
         });
 
-        time = 0;
-        timeBetweenShots = 400;
         this.status = status;
     }
 
@@ -116,11 +112,10 @@ public class GameCourt extends JPanel {
         cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/8, COURT_WIDTH/2, COURT_HEIGHT/2);
         ship = new Ship(COURT_WIDTH, COURT_HEIGHT, centerX, centerY, Color.BLUE);
         cannonBalls = new LinkedList<>();
-
-        System.out.println();
-        System.out.println(COURT_HEIGHT);
-
-        cannonInterval = 750;
+        cannonInterval = INIT_CANNON_INTERVAL;
+        shipSpeed = INIT_SHIP_SPEED;
+        cannonballSpeed = INIT_CANNONBALL_SPEED;
+        cannonInterval = INIT_CANNON_INTERVAL;
         direction = OrbitDirection.CW;
         playing = true;
         status.setText("Running...");
@@ -133,12 +128,10 @@ public class GameCourt extends JPanel {
     void tick() {
         if (playing) {
 
-            time ++;
-
             List<CannonBall> toRemove = new LinkedList<CannonBall>();
-            ship.moveInCircle(direction, 0.25, ORBIT_RADIUS);
+            ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
             for (CannonBall c : cannonBalls) {
-                c.moveAtAngle(2.0);
+                c.moveAtAngle(cannonballSpeed);
 
                 if (c.isTouchingBorder()) {
                     toRemove.add(c);
@@ -159,22 +152,29 @@ public class GameCourt extends JPanel {
 
     void cannonTick() {
         if (playing) {
-            double shipAngle = ship.getAngleInDegrees();
-            System.out.println(shipAngle);
-            double launchAngle = (Math.random() - 0.5) * 60 + shipAngle + direction.getDirection() * 30;
+            double currentShipAngle = ship.getAngleInDegrees();
+            double expectedShipAngle = (ORBIT_RADIUS/cannonballSpeed) * shipSpeed;
+            double launchAngle = (Math.random() - 0.5) * 90 + currentShipAngle
+                    + direction.getDirection() * expectedShipAngle;
 
             cannonBalls.add(new CannonBall(COURT_WIDTH, COURT_HEIGHT, launchAngle));
-            if (cannonInterval > 150) {
-                cannonInterval -= 2;
+            if (cannonInterval > MIN_CANNON_INTERVAL) {
+                cannonInterval -= CANNON_TIME_DECREASE;
                 cannonTimer.stop();
                 cannonTimer = new Timer(cannonInterval, e -> cannonTick());
                 cannonTimer.start();
             } else {
-                cannonInterval = 150;
+                cannonInterval = MIN_CANNON_INTERVAL;
                 cannonTimer.stop();
                 cannonTimer = new Timer(cannonInterval, e -> cannonTick());
                 cannonTimer.start();
             }
+        }
+    }
+
+    void speedIncreaseTick() {
+        if (playing) {
+
         }
     }
 
