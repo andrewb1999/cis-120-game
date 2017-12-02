@@ -16,8 +16,6 @@ public class Game implements Runnable {
     public void run() {
         // NOTE : recall that the 'final' keyword notes immutability even for local variables.
 
-        // Top-level frame in which game components live
-        // Be sure to change "TOP LEVEL FRAME" to the name of your game
         final JFrame frame = new JFrame("Corsairs");
         frame.setLayout(new BorderLayout());
 
@@ -40,6 +38,7 @@ public class Game implements Runnable {
         frame.add(game_panel, BorderLayout.CENTER);
         final GameCourt court = new GameCourt(score, invincibility);
         game_panel.add(court, BorderLayout.CENTER);
+
 
         // Reset button
         final JPanel control_panel = new JPanel();

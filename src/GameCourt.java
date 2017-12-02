@@ -9,6 +9,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * GameCourt
@@ -35,25 +37,27 @@ public class GameCourt extends JPanel {
     private final int CENTER_Y = COURT_HEIGHT/2;
     private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
     private static final int INTERVAL = 1;
-    private static final int CANNON_TIME_DECREASE = 5;
-    private static final int MIN_CANNON_INTERVAL = 100;
+    private static final int CANNON_TIME_DECREASE = 7;
+    private static final int MIN_CANNON_INTERVAL = 200;
     private static final int SPEED_INCREASE_INTERVAL = 5000;
     private static final int INVINCIBILITY_INTERVAL = 1000;
+    private static final int NEW_COIN_INTERVAL = 500;
     private static final int INVINCIBILITY_LENGTH = 5;
-    private static final int INIT_CANNON_INTERVAL = 750;
-    private final double INIT_SHIP_SPEED = COURT_HEIGHT/5760.0;
-    private final double INIT_CANNONBALL_SPEED = COURT_HEIGHT/1080.0;
-    private final double SHIP_SPEED_INCREASE = COURT_HEIGHT/57600.0;
-    private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/14400.0;
+    private static final int INIT_CANNON_INTERVAL = 1000;
+    private final double INIT_SHIP_SPEED = 0.005;
+    private final double INIT_CANNONBALL_SPEED = 3.0;
+    private final double SHIP_SPEED_INCREASE = 0.0005;
+    private final double CANNONBALL_SPEED_INCREASE = .1;
 
     // the state of the game logic
     private Ship ship;
     private Cannon cannon;
     private CircleObj centerTest;
     private List<CannonBall> cannonBalls;
-    private List<CollectibleCircleObject> collectibles;
+    private Set<CollectibleCircleObject> collectibles;
     private Timer cannonTimer;
     private Timer invincibilityTimer;
+    private Timer newCoinTimer;
     private int cannonInterval;
     private double shipSpeed;
     private double cannonballSpeed;
@@ -92,6 +96,9 @@ public class GameCourt extends JPanel {
 
         invincibilityTimer = new Timer(INVINCIBILITY_INTERVAL, e -> invincibilityTick());
 
+        newCoinTimer = new Timer(NEW_COIN_INTERVAL, e -> newCoinTick());
+        newCoinTimer.start();
+
         setFocusable(true);
 
         addKeyListener(new KeyAdapter() {
@@ -122,15 +129,8 @@ public class GameCourt extends JPanel {
     public void reset() {
         cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/8, COURT_WIDTH/2, COURT_HEIGHT/2);
         ship = new Ship(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y, Color.BLUE);
-        centerTest = new CircleObj(CENTER_X - 10, CENTER_Y - 10, 10, COURT_WIDTH, COURT_HEIGHT) {
-            @Override
-            public void draw(Graphics g) {
-                g.setColor(Color.BLACK);
-                g.fillOval(this.getPx(), this.getPy(), this.getWidth(), this.getHeight());
-            }
-        };
         cannonBalls = new LinkedList<>();
-        collectibles = new LinkedList<>();
+        collectibles = new TreeSet<>();
         for (int i = 0; i < 360; i += 10) {
             if (i != 90 && i != 0)
                 collectibles.add(Coin.createCoin(ORBIT_RADIUS, i, COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y));
@@ -151,6 +151,7 @@ public class GameCourt extends JPanel {
         invincibilityText.setText("You are not invincible");
         requestFocusInWindow();
     }
+
 
     /**
      * This method is called every time the timer defined in the constructor triggers.
@@ -204,7 +205,7 @@ public class GameCourt extends JPanel {
     private void cannonTick() {
         if (playing) {
             double currentShipAngle = ship.getAngleInDegrees();
-            double expectedAdditionalShipAngle = (ORBIT_RADIUS/cannonballSpeed) * shipSpeed;
+            double expectedAdditionalShipAngle = (ORBIT_RADIUS/cannonballSpeed) * Math.toDegrees(shipSpeed);
             double launchAngle;
             if (Math.random() > 0.5) {
                 launchAngle = (Math.random() - 0.5) * 30 + currentShipAngle
@@ -237,11 +238,28 @@ public class GameCourt extends JPanel {
 
     private void invincibilityTick() {
         if (playing) {
-            if (invincibilityTimeLeft > 0) {
+            if (invincibilityTimeLeft > 1) {
                 invincibilityTimeLeft--;
             } else {
                 isInvincible = false;
+                ship.setColor(Color.BLUE);
                 invincibilityTimer.stop();
+            }
+        }
+    }
+
+    private void newCoinTick() {
+        if (playing) {
+            if (Math.random() > 0.025 ) {
+                double randomAngle = Math.random() * 360;
+                int roundedAngle = ((int) randomAngle/10 + 5) * 10;
+                collectibles.add(Coin.createCoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
+                        COURT_HEIGHT, CENTER_X, CENTER_Y));
+            } else {
+                double randomAngle = Math.random() * 360;
+                int roundedAngle = ((int) randomAngle/10 + 5) * 10;
+                collectibles.add(InvincibilityCoin.createICoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
+                        COURT_HEIGHT, CENTER_X, CENTER_Y));
             }
         }
     }
@@ -252,7 +270,8 @@ public class GameCourt extends JPanel {
 
     public void makeInvincible() {
         isInvincible = true;
-        invincibilityTimeLeft = 5;
+        invincibilityTimeLeft = INVINCIBILITY_LENGTH;
+        ship.setColor(new Color(51, 204, 255));
         invincibilityTimer.start();
     }
 
@@ -266,15 +285,17 @@ public class GameCourt extends JPanel {
 
         for (CollectibleCircleObject c : collectibles)
             c.draw(g);
+
+        cannon.draw(g);
+
+        ship.draw(g);
         for (CannonBall c : cannonBalls)
             c.draw(g);
-//        cannon.draw(g);
-        centerTest.draw(g);
-        ship.draw(g);
     }
+
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(COURT_WIDTH, COURT_HEIGHT);
+            return new Dimension(COURT_WIDTH, COURT_HEIGHT);
     }
 }

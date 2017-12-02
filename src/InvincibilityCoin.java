@@ -16,8 +16,8 @@ public class InvincibilityCoin extends CollectibleCircleObject{
      * @param courtWidth
      * @param courtHeight
      */
-    public InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight) {
-        super(px, py, radius, courtWidth, courtHeight);
+    public InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
+        super(px, py, radius, courtWidth, courtHeight, angleInDegrees);
 
         if (img == null) {
             img = new ImageIcon(IMG_FILE).getImage();
@@ -32,9 +32,7 @@ public class InvincibilityCoin extends CollectibleCircleObject{
         int py = centerY - cy - courtWidth/COIN_RADIUS_FACTOR;
         int radius = courtHeight/COIN_RADIUS_FACTOR;
 
-        double theta = Math.toRadians(angleInDegrees);
-
-        return new InvincibilityCoin(px, py, radius, courtWidth, courtHeight);
+        return new InvincibilityCoin(px, py, radius, courtWidth, courtHeight, angleInDegrees);
     }
 
     @Override

@@ -39,13 +39,18 @@ public class Ship extends CircleObj {
         return Math.toDegrees(-Math.atan2(centerY - getPy(), centerX - getPx())) + 180;
     }
 
-    public void moveInCircle(GameCourt.OrbitDirection direction, double speedInDegrees, int radius) {
-        theta -= direction.getDirection() * Math.toRadians(speedInDegrees);
-        double x = centerX + radius*Math.cos(theta);
-        double y  = centerY + radius*Math.sin(theta);
+    public void moveInCircle(GameCourt.OrbitDirection direction, double speedInRadians, int radius) {
+        theta -= direction.getDirection() * speedInRadians;
+        double x = (centerX + radius*Math.cos(theta));
+        double y  = (centerY + radius*Math.sin(theta));
 
-        this.setPx((int) x - courtWidth/RADIUS_FACTOR);
-        this.setPy((int) y - courtWidth/RADIUS_FACTOR);
+
+        this.setPx((int) x - getRadius());
+        this.setPy((int) y - getRadius());
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override
