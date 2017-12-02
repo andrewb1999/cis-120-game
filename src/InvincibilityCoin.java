@@ -1,15 +1,12 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-public class Coin extends CollectibleCircleObject {
+public class InvincibilityCoin extends CollectibleCircleObject{
     private static final int COIN_RADIUS_FACTOR = 50;
-    //private Color color = Color.YELLOW;
-    private static final String IMG_FILE = "files/coin-animation-s.gif";
+    private Color color = Color.GREEN;
+    private static final String IMG_FILE = "files/coin-animation-i.gif";
     private static Image img;
+
     /**
      * Constructor
      *
@@ -19,15 +16,15 @@ public class Coin extends CollectibleCircleObject {
      * @param courtWidth
      * @param courtHeight
      */
-    private Coin(int px, int py, int radius, int courtWidth, int courtHeight) {
+    public InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight) {
         super(px, py, radius, courtWidth, courtHeight);
 
-            if (img == null) {
-                img = new ImageIcon(IMG_FILE).getImage();
-            }
+        if (img == null) {
+            img = new ImageIcon(IMG_FILE).getImage();
+        }
     }
 
-    public static Coin createCoin(int circleRadius, double angleInDegrees, int courtWidth,
+    public static InvincibilityCoin createICoin(int circleRadius, double angleInDegrees, int courtWidth,
                                   int courtHeight, int centerX, int centerY) {
         int cx = (int) (circleRadius * Math.cos(Math.toRadians(angleInDegrees)));
         int cy = (int) (circleRadius * Math.sin(Math.toRadians(angleInDegrees)));
@@ -37,12 +34,12 @@ public class Coin extends CollectibleCircleObject {
 
         double theta = Math.toRadians(angleInDegrees);
 
-        return new Coin(px, py, radius, courtWidth, courtHeight);
+        return new InvincibilityCoin(px, py, radius, courtWidth, courtHeight);
     }
 
     @Override
     public void modifyState(GameCourt c) {
-        c.incrementScore();
+        c.makeInvincible();
     }
 
     @Override
