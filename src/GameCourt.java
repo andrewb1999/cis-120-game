@@ -127,8 +127,8 @@ public class GameCourt extends JPanel {
      * (Re-)set the game to its initial state.
      */
     public void reset() {
-        cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/8, COURT_WIDTH/2, COURT_HEIGHT/2);
-        ship = new Ship(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y, Color.BLUE);
+        cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/16, COURT_WIDTH/2, COURT_HEIGHT/2);
+        ship = Ship.makeShip(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y, Color.BLUE);
         cannonBalls = new LinkedList<>();
         collectibles = new TreeSet<>();
         for (int i = 0; i < 360; i += 10) {
@@ -161,7 +161,6 @@ public class GameCourt extends JPanel {
 
             List<CannonBall> toRemove = new LinkedList<CannonBall>();
             ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
-
 
             List<CollectibleCircleObject> toRemoveCollectible = new LinkedList<CollectibleCircleObject>();
             for (CollectibleCircleObject c : collectibles) {
@@ -214,7 +213,7 @@ public class GameCourt extends JPanel {
                 launchAngle = (Math.random() - 0.5) * 45 + currentShipAngle;
             }
 
-            cannonBalls.add(new CannonBall(COURT_WIDTH, COURT_HEIGHT, launchAngle));
+            cannonBalls.add(CannonBall.makeCannonBall(COURT_WIDTH, COURT_HEIGHT, launchAngle));
             if (cannonInterval > MIN_CANNON_INTERVAL) {
                 cannonInterval -= CANNON_TIME_DECREASE;
                 cannonTimer.stop();
@@ -286,11 +285,13 @@ public class GameCourt extends JPanel {
         for (CollectibleCircleObject c : collectibles)
             c.draw(g);
 
-        cannon.draw(g);
+
 
         ship.draw(g);
         for (CannonBall c : cannonBalls)
             c.draw(g);
+
+        cannon.draw(g);
     }
 
 

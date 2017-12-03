@@ -20,23 +20,18 @@ import javax.imageio.ImageIO;
  */
 public class Cannon extends SquareObj {
     public static final String IMG_FILE = "files/poison.png";
+    private static final Color COLOR = new Color(150, 150, 150);
 
     private static BufferedImage img;
 
     public Cannon(int courtWidth, int courtHeight, int size, int initPosX, int initPosY) {
         super(initPosX - size/2, initPosY - size/2, size, size, courtWidth, courtHeight);
 
-        try {
-            if (img == null) {
-                img = ImageIO.read(new File(IMG_FILE));
-            }
-        } catch (IOException e) {
-            System.out.println("Internal Error:" + e.getMessage());
-        }
     }
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(img, this.getPx(), this.getPy(), this.getWidth(), this.getHeight(), null);
+        g.setColor(this.COLOR);
+        g.fillOval(this.getPx(), this.getPy(), this.getWidth(), this.getHeight());
     }
 }

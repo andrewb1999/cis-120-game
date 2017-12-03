@@ -22,17 +22,24 @@ public class Ship extends CircleObj {
 
     private Color color;
 
-    public Ship(int courtWidth, int courtHeight, int centerX, int centerY, Color color) {
-        super(courtWidth/INIT_X_FACTOR - courtWidth/RADIUS_FACTOR,
-                courtHeight/INIT_Y_FACTOR - courtWidth/RADIUS_FACTOR, courtWidth/RADIUS_FACTOR,
-                courtWidth, courtHeight);
+    private Ship(int px, int py, int radius, int centerX, int centerY, int courtWidth, int courtHeight, Color color) {
+        super(px, py, radius, courtWidth, courtHeight);
 
-        this.courtWidth = courtWidth;
-        this.courtHeight = courtHeight;
         this.centerX = centerX;
         this.centerY = centerY;
+        this.courtWidth = courtWidth;
+        this.courtHeight = courtHeight;
         theta = -Math.atan2(centerY - getPy(), centerX - getPx());
         this.color = color;
+    }
+
+    public static Ship makeShip(int courtWidth, int courtHeight, int centerX, int centerY, Color color) {
+        int px = courtWidth/INIT_X_FACTOR - courtWidth/RADIUS_FACTOR;
+        int py = courtHeight/INIT_Y_FACTOR - courtWidth/RADIUS_FACTOR;
+        int radius = courtWidth/RADIUS_FACTOR;
+
+
+        return new Ship (px, py, radius, centerX, centerY, courtWidth, courtHeight, color);
     }
 
     public double getAngleInDegrees() {
@@ -43,7 +50,6 @@ public class Ship extends CircleObj {
         theta -= direction.getDirection() * speedInRadians;
         double x = (centerX + radius*Math.cos(theta));
         double y  = (centerY + radius*Math.sin(theta));
-
 
         this.setPx((int) x - getRadius());
         this.setPy((int) y - getRadius());
