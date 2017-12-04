@@ -19,10 +19,12 @@ public class Ship extends CircleObj {
     private static final int RADIUS_FACTOR = 40;
     private static final int INIT_X_FACTOR = 2;
     private static final int INIT_Y_FACTOR = 8;
+    private static final Color iColor = new Color(51, 204, 255);
+    private static final Color nIColor = Color.BLUE;
 
     private Color color;
 
-    private Ship(int px, int py, int radius, int centerX, int centerY, int courtWidth, int courtHeight, Color color) {
+    private Ship(int px, int py, int radius, int centerX, int centerY, int courtWidth, int courtHeight) {
         super(px, py, radius, courtWidth, courtHeight);
 
         this.centerX = centerX;
@@ -30,16 +32,16 @@ public class Ship extends CircleObj {
         this.courtWidth = courtWidth;
         this.courtHeight = courtHeight;
         theta = -Math.atan2(centerY - getPy(), centerX - getPx());
-        this.color = color;
+        color = nIColor;
     }
 
-    public static Ship makeShip(int courtWidth, int courtHeight, int centerX, int centerY, Color color) {
+    public static Ship makeShip(int courtWidth, int courtHeight, int centerX, int centerY) {
         int px = courtWidth/INIT_X_FACTOR - courtWidth/RADIUS_FACTOR;
         int py = courtHeight/INIT_Y_FACTOR - courtWidth/RADIUS_FACTOR;
         int radius = courtWidth/RADIUS_FACTOR;
 
 
-        return new Ship (px, py, radius, centerX, centerY, courtWidth, courtHeight, color);
+        return new Ship (px, py, radius, centerX, centerY, courtWidth, courtHeight);
     }
 
     public double getAngleInDegrees() {
@@ -55,8 +57,16 @@ public class Ship extends CircleObj {
         this.setPy((int) y - getRadius());
     }
 
-    public void setColor(Color color) {
+    private void setColor(Color color) {
         this.color = color;
+    }
+
+    public void setInvincibility(boolean isInvincible) {
+        if(isInvincible) {
+            setColor(iColor);
+        } else {
+            setColor(nIColor);
+        }
     }
 
     @Override
