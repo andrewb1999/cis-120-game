@@ -36,7 +36,7 @@ public class GameCourt extends JPanel {
     private final int CENTER_X = COURT_WIDTH/2;
     private final int CENTER_Y = COURT_HEIGHT/2;
     private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
-    private static final int INTERVAL = 1;
+    private static final int INTERVAL = 10;
     private static final int CANNON_TIME_DECREASE = 7;
     private static final int MIN_CANNON_INTERVAL = 200;
     private static final int SPEED_INCREASE_INTERVAL = 5000;
@@ -44,9 +44,9 @@ public class GameCourt extends JPanel {
     private static final int NEW_COIN_INTERVAL = 500;
     private static final int INVINCIBILITY_LENGTH = 5;
     private static final int INIT_CANNON_INTERVAL = 1000;
-    private final double INIT_SHIP_SPEED = 0.005;
+    private final double INIT_SHIP_SPEED = 0.01;
     private final double INIT_CANNONBALL_SPEED = 3.0;
-    private final double SHIP_SPEED_INCREASE = 0.0005;
+    private final double SHIP_SPEED_INCREASE = 0.001;
     private final double CANNONBALL_SPEED_INCREASE = .1;
 
     // the state of the game logic
