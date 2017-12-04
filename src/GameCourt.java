@@ -7,10 +7,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * GameCourt
@@ -45,22 +43,20 @@ public class GameCourt extends JPanel {
     private static final int INVINCIBILITY_LENGTH = 5;
     private static final int INIT_CANNON_INTERVAL = 1000;
     private final double INIT_SHIP_SPEED = 0.005;
-    private final double INIT_CANNONBALL_SPEED = 3.0;
+    private final double INIT_CANNONBALL_SPEED = 1.0;
     private final double SHIP_SPEED_INCREASE = 0.0005;
     private final double CANNONBALL_SPEED_INCREASE = .1;
 
     // the state of the game logic
     private Ship ship;
     private Cannon cannon;
-    private CircleObj centerTest;
     private List<CannonBall> cannonBalls;
-    private Set<CollectibleCircleObject> collectibles;
-    private Timer cannonTimer;
-    private Timer invincibilityTimer;
-    private Timer newCoinTimer;
+    private CollectibleSet collectibles;
+    private GameCourtTimer gameTimer;
+    private Thread timingThread;
     private int cannonInterval;
     private double shipSpeed;
-    private double cannonballSpeed;
+    private double cannonBallSpeed;
     private boolean isInvincible;
     private int score;
     private int invincibilityTimeLeft;
@@ -85,19 +81,26 @@ public class GameCourt extends JPanel {
     public GameCourt(JLabel scoreText, JLabel invincibilityText) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        Timer timer = new Timer(INTERVAL, e -> tick());
-        timer.start();
 
-        cannonTimer = new Timer(cannonInterval, e -> cannonTick());
-        cannonTimer.start();
 
-        Timer speedIncreaseTimer = new Timer(SPEED_INCREASE_INTERVAL, e -> speedIncreaseTick());
-        speedIncreaseTimer.start();
+//        Timer timer = new Timer(INTERVAL, e -> repaintTick());
+//        timer.start();
+//
+//        cannonTimer = new Timer(cannonInterval, e -> cannonTick());
+//        cannonTimer.start();
+//
+//        Timer speedIncreaseTimer = new Timer(SPEED_INCREASE_INTERVAL, e -> speedIncreaseTick());
+//        speedIncreaseTimer.start();
+//
+//        invincibilityTimer = new Timer(INVINCIBILITY_INTERVAL, e -> invincibilityTick());
+//
+//        newCoinTimer = new Timer(NEW_COIN_INTERVAL, e -> newCoinTick());
+//        newCoinTimer.start();
 
-        invincibilityTimer = new Timer(INVINCIBILITY_INTERVAL, e -> invincibilityTick());
+        gameTimer = new GameCourtTimer(INTERVAL);
 
-        newCoinTimer = new Timer(NEW_COIN_INTERVAL, e -> newCoinTick());
-        newCoinTimer.start();
+        timingThread = new Thread(gameTimer);
+        timingThread.start();
 
         setFocusable(true);
 
@@ -123,6 +126,98 @@ public class GameCourt extends JPanel {
         this.scoreText = scoreText;
     }
 
+    private class GameCourtTimer implements Runnable {
+
+        private final long INIT_TIME;
+        private long timeDifference;
+        private long timeElapsed;
+        private long sleep;
+        private long intervalInMillis;
+
+        public GameCourtTimer(int intervalInMillis){
+            INIT_TIME = System.currentTimeMillis();
+            this.intervalInMillis = (long) intervalInMillis;
+            timeElapsed = 0;
+        }
+
+        @Override
+        public void run() {
+
+            while (true) {
+                tick();
+
+                timeDifference = System.currentTimeMillis() - INIT_TIME;
+                timeElapsed++;
+                sleep = intervalInMillis - timeDifference;
+
+                if (sleep < 0) {
+                    sleep = 2;
+                }
+
+                try {
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    System.out.println("Interrupted: " + e.getMessage());
+                }
+            }
+        }
+
+        public long getTimeElapsed() {
+            return timeElapsed;
+        }
+    }
+
+    private class CollectibleSet {
+        private Set<CollectibleCircleObject> collectibles;
+
+        public CollectibleSet() {
+            collectibles = new TreeSet<>();
+        }
+
+        public synchronized Set<CollectibleCircleObject> getCollectibles() {
+            Set<CollectibleCircleObject> newC = new TreeSet<>(collectibles);
+            return newC;
+        }
+
+        public synchronized void add(CollectibleCircleObject c) {
+            collectibles.add(c);
+        }
+
+        public synchronized void addAll(Set<CollectibleCircleObject> c) {
+            collectibles.addAll(c);
+        }
+
+        public synchronized void removeAll(Set<CollectibleCircleObject> c) {
+            collectibles.removeAll(c);
+        }
+    }
+
+    private class CannonBallList {
+        private List<CannonBall> collectibles;
+
+        public CannonBallList() {
+            collectibles = new LinkedList<>();
+        }
+
+        public synchronized List<CannonBall> getCollectibles() {
+            List<CannonBall> newC = new LinkedList<>();
+            newC.addAll(collectibles);
+            return newC;
+        }
+
+        public synchronized void add(CannonBall c) {
+            collectibles.add(c);
+        }
+
+        public synchronized void addAll(Collection<CannonBall> c) {
+            collectibles.addAll(c);
+        }
+
+        public synchronized void removeAll(Collection<CannonBall> c) {
+            collectibles.removeAll(c);
+        }
+    }
+
     /**
      * (Re-)set the game to its initial state.
      */
@@ -130,20 +225,21 @@ public class GameCourt extends JPanel {
         cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/16, COURT_WIDTH/2, COURT_HEIGHT/2);
         ship = Ship.makeShip(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y, Color.BLUE);
         cannonBalls = new LinkedList<>();
-        collectibles = new TreeSet<>();
+        collectibles = new CollectibleSet();
         for (int i = 0; i < 360; i += 10) {
             if (i != 90 && i != 0)
                 collectibles.add(Coin.createCoin(ORBIT_RADIUS, i, COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y));
-            if (i == 0)
-                collectibles.add(InvincibilityCoin.createICoin(ORBIT_RADIUS, i, COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y));
+//            if (i == 0)
+//                collectibles.add(InvincibilityCoin.createICoin(ORBIT_RADIUS, i, COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y));
         }
+
 
         score = 0;
         invincibilityTimeLeft = 0;
         cannonInterval = INIT_CANNON_INTERVAL;
         isInvincible = false;
         shipSpeed = INIT_SHIP_SPEED;
-        cannonballSpeed = INIT_CANNONBALL_SPEED;
+        cannonBallSpeed = INIT_CANNONBALL_SPEED;
         cannonInterval = INIT_CANNON_INTERVAL;
         direction = OrbitDirection.CW;
         playing = true;
@@ -159,18 +255,17 @@ public class GameCourt extends JPanel {
     private void tick() {
         if (playing) {
 
-            List<CannonBall> toRemove = new LinkedList<CannonBall>();
-            ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
+            List<CannonBall> toRemove = new LinkedList<>();
 
-            List<CollectibleCircleObject> toRemoveCollectible = new LinkedList<CollectibleCircleObject>();
-            for (CollectibleCircleObject c : collectibles) {
-                if (c.intersects(ship)) {
-                    c.modifyState(this);
-                    toRemoveCollectible.add(c);
-                }
-            }
-
-            collectibles.removeAll(toRemoveCollectible);
+//            Set<CollectibleCircleObject> toRemoveCollectible = new TreeSet<CollectibleCircleObject>();
+//            for (CollectibleCircleObject c : collectibles.getCollectibles()) {
+//                if (c.intersects(ship)) {
+//                    c.modifyState(this);
+//                    toRemoveCollectible.add(c);
+//                }
+//            }
+//
+//            collectibles.removeAll(toRemoveCollectible);
 
             scoreText.setText("Score: " + score);
 
@@ -182,7 +277,7 @@ public class GameCourt extends JPanel {
 
             //Exit Conditions
             for (CannonBall c : cannonBalls) {
-                c.moveAtAngle(cannonballSpeed);
+                c.moveAtAngle(cannonBallSpeed);
 
                 if (c.isTouchingBorder()) {
                     toRemove.add(c);
@@ -195,6 +290,26 @@ public class GameCourt extends JPanel {
             }
 
             cannonBalls.removeAll(toRemove);
+            ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
+
+            if(gameTimer.getTimeElapsed() % cannonInterval == 0) {
+                cannonTick();
+            }
+
+            if(gameTimer.getTimeElapsed() % SPEED_INCREASE_INTERVAL == 0) {
+                speedIncreaseTick();
+            }
+
+            if(gameTimer.getTimeElapsed() % NEW_COIN_INTERVAL == 0) {
+                newCoinTick();
+            }
+
+            if(invincibilityTimeLeft > 0 && gameTimer.getTimeElapsed() % 1000 == 0) {
+                invincibilityTimeLeft--;
+            } else {
+                invincibilityTimeLeft = 0;
+                isInvincible = false;
+            }
 
             // update the display
             repaint();
@@ -204,7 +319,7 @@ public class GameCourt extends JPanel {
     private void cannonTick() {
         if (playing) {
             double currentShipAngle = ship.getAngleInDegrees();
-            double expectedAdditionalShipAngle = (ORBIT_RADIUS/cannonballSpeed) * Math.toDegrees(shipSpeed);
+            double expectedAdditionalShipAngle = (ORBIT_RADIUS/ cannonBallSpeed) * Math.toDegrees(shipSpeed);
             double launchAngle;
             if (Math.random() > 0.5) {
                 launchAngle = (Math.random() - 0.5) * 30 + currentShipAngle
@@ -214,24 +329,20 @@ public class GameCourt extends JPanel {
             }
 
             cannonBalls.add(CannonBall.makeCannonBall(COURT_WIDTH, COURT_HEIGHT, launchAngle));
-            if (cannonInterval > MIN_CANNON_INTERVAL) {
-                cannonInterval -= CANNON_TIME_DECREASE;
-                cannonTimer.stop();
-                cannonTimer = new Timer(cannonInterval, e -> cannonTick());
-                cannonTimer.start();
-            } else {
-                cannonInterval = MIN_CANNON_INTERVAL;
-                cannonTimer.stop();
-                cannonTimer = new Timer(cannonInterval, e -> cannonTick());
-                cannonTimer.start();
-            }
         }
     }
 
     private void speedIncreaseTick() {
         if (playing) {
+
+            if (cannonInterval > MIN_CANNON_INTERVAL) {
+                cannonInterval -= CANNON_TIME_DECREASE;
+            } else {
+                cannonInterval = MIN_CANNON_INTERVAL;
+            }
+
             shipSpeed += SHIP_SPEED_INCREASE;
-            cannonballSpeed += CANNONBALL_SPEED_INCREASE;
+            cannonBallSpeed += CANNONBALL_SPEED_INCREASE;
         }
     }
 
@@ -242,7 +353,6 @@ public class GameCourt extends JPanel {
             } else {
                 isInvincible = false;
                 ship.setColor(Color.BLUE);
-                invincibilityTimer.stop();
             }
         }
     }
@@ -271,7 +381,6 @@ public class GameCourt extends JPanel {
         isInvincible = true;
         invincibilityTimeLeft = INVINCIBILITY_LENGTH;
         ship.setColor(new Color(51, 204, 255));
-        invincibilityTimer.start();
     }
 
 //    public int getScore() {
@@ -282,12 +391,16 @@ public class GameCourt extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        for (CollectibleCircleObject c : collectibles)
-            c.draw(g);
-
-
-
         ship.draw(g);
+
+        Iterator<CollectibleCircleObject> iter = collectibles.getCollectibles().iterator();
+
+        while (iter.hasNext()) {
+            CollectibleCircleObject c = iter.next();
+
+            c.draw(g);
+        }
+
         for (CannonBall c : cannonBalls)
             c.draw(g);
 
