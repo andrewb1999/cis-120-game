@@ -40,11 +40,11 @@ public class GameCourt extends JPanel {
     private static final int MIN_CANNON_INTERVAL = 200;
     private static final int SPEED_INCREASE_INTERVAL = 10000;
     private static final int NEW_COIN_INTERVAL = 500;
-    private static final int INVINCIBILITY_LENGTH = 5000;
+    private static final int POWER_UP_LENGTH = 5000;
     private static final int INIT_CANNON_INTERVAL = 2000;
     private final double INIT_SHIP_SPEED = 0.001;
     private final double INIT_CANNONBALL_SPEED = COURT_HEIGHT/2500.0;
-    private final double SHIP_SPEED_INCREASE = 0.00015;
+    private final double SHIP_SPEED_INCREASE = 0.00025;
     private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/20000.0;
 
     // the state of the game logic
@@ -58,7 +58,8 @@ public class GameCourt extends JPanel {
     private double cannonBallSpeed;
     private boolean isInvincible;
     private int score;
-    private int invincibilityTimeLeft;
+    private int powerUpTimeLeft;
+    private boolean isDoubleCoins;
 
 
     public enum OrbitDirection {
@@ -168,7 +169,7 @@ public class GameCourt extends JPanel {
         }
 
         score = 0;
-        invincibilityTimeLeft = 0;
+        powerUpTimeLeft = 0;
         cannonTime = 0;
         speedIncreaseTime = 0;
         newCoinTime = 0;
@@ -211,7 +212,7 @@ public class GameCourt extends JPanel {
             scoreText.setText("Score: " + score);
 
             if (isInvincible) {
-                invincibilityText.setText("Invincibility left: " + invincibilityTimeLeft/1000 + " seconds");
+                invincibilityText.setText("Invincibility left: " + powerUpTimeLeft /1000 + " seconds");
             } else {
                 invincibilityText.setText("You are not invincible");
             }
@@ -256,11 +257,12 @@ public class GameCourt extends JPanel {
                 newCoinTime++;
             }
 
-            if(invincibilityTimeLeft > 0) {
-                invincibilityTimeLeft--;
+            if(powerUpTimeLeft > 0) {
+                powerUpTimeLeft--;
             } else {
-                invincibilityTimeLeft = 0;
+                powerUpTimeLeft = 0;
                 isInvincible = false;
+                isDoubleCoins = false;
                 ship.setInvincibility(false);
             }
 
@@ -304,16 +306,21 @@ public class GameCourt extends JPanel {
     }
 
     private void addRandomCoin() {
-        if (Math.random() > 0.015 ) {
+        if (Math.random() > 0.02 ) {
             double randomAngle = Math.random() * 360;
             int roundedAngle = ((int) randomAngle/10 + 5) * 10;
             collectibles.add(Coin.createCoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
-                    COURT_HEIGHT, CENTER_X, CENTER_Y));
+                        COURT_HEIGHT, CENTER_X, CENTER_Y));
         } else {
             double randomAngle = Math.random() * 360;
             int roundedAngle = ((int) randomAngle/10 + 5) * 10;
-            collectibles.add(InvincibilityCoin.createICoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
-                    COURT_HEIGHT, CENTER_X, CENTER_Y));
+            if (Math.random() > 0.5) {
+                collectibles.add(InvincibilityCoin.createICoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
+                        COURT_HEIGHT, CENTER_X, CENTER_Y));
+            } else {
+                collectibles.add(DoubleCoinsCoin.createDCoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
+                        COURT_HEIGHT, CENTER_X, CENTER_Y));
+            }
         }
     }
 
@@ -324,13 +331,22 @@ public class GameCourt extends JPanel {
     }
 
     public void incrementScore() {
-        score++;
+        if (isDoubleCoins) {
+            score += 2;
+        } else {
+            score++;
+        }
     }
 
     public void makeInvincible() {
         isInvincible = true;
-        invincibilityTimeLeft = INVINCIBILITY_LENGTH;
+        powerUpTimeLeft = POWER_UP_LENGTH;
         ship.setInvincibility(true);
+    }
+
+    public void makeDoubleCoins() {
+        isDoubleCoins = true;
+        powerUpTimeLeft = POWER_UP_LENGTH;
     }
 
     @Override
