@@ -62,6 +62,7 @@ public class GameCourt extends JPanel {
     private int score;
     private int powerUpTimeLeft;
     private boolean isDoubleCoins;
+    private boolean canStart;
 
 
     public enum OrbitDirection {
@@ -91,6 +92,7 @@ public class GameCourt extends JPanel {
             }
         }), 0, INTERVAL);
 
+        canStart = false;
         setFocusable(true);
 
         addKeyListener(new KeyAdapter() {
@@ -98,9 +100,13 @@ public class GameCourt extends JPanel {
 
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SPACE  && !spaceIsPressed) {
-                    direction = (direction == OrbitDirection.CW) ?
-                            OrbitDirection.CCW : OrbitDirection.CW;
-                    spaceIsPressed = true;
+                    if(!canStart) {
+                        canStart = true;
+                    } else {
+                        direction = (direction == OrbitDirection.CW) ?
+                                OrbitDirection.CCW : OrbitDirection.CW;
+                        spaceIsPressed = true;
+                    }
                 }
             }
 
@@ -117,9 +123,13 @@ public class GameCourt extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (!mouseIsPressed) {
-                    direction = (direction == OrbitDirection.CW) ?
-                            OrbitDirection.CCW : OrbitDirection.CW;
-                    mouseIsPressed = true;
+                    if(!canStart) {
+                        canStart = true;
+                    } else {
+                        direction = (direction == OrbitDirection.CW) ?
+                                OrbitDirection.CCW : OrbitDirection.CW;
+                        mouseIsPressed = true;
+                    }
                 }
             }
 
@@ -142,22 +152,26 @@ public class GameCourt extends JPanel {
     }
 
     private class CollectibleSet {
-        private Set<CollectibleCircleObject> collectibles;
+        private Set<Coin> collectibles;
 
         CollectibleSet() {
             collectibles = new TreeSet<>();
         }
 
-        synchronized Set<CollectibleCircleObject> getCollectibles() {
-            Set<CollectibleCircleObject> newC = new TreeSet<>(collectibles);
+        synchronized Set<Coin> getCollectibles() {
+            Set<Coin> newC = new TreeSet<>(collectibles);
             return newC;
         }
 
-        synchronized void add(CollectibleCircleObject c) {
+        synchronized void add(Coin c) {
             collectibles.add(c);
         }
 
-        synchronized void removeAll(Set<CollectibleCircleObject> c) {
+        synchronized  void remove(Coin c) {
+            collectibles.remove(c);
+        }
+
+        synchronized void removeAll(Set<Coin> c) {
             collectibles.removeAll(c);
         }
     }
@@ -196,6 +210,15 @@ public class GameCourt extends JPanel {
             addRandomCoin();
         }
 
+        for (Coin c : collectibles.getCollectibles()) {
+            System.out.println("Here1");
+            if (c.getAngle() == 90) {
+                System.out.println("Here");
+                collectibles.remove(c);
+            }
+        }
+
+        playing = false;
         score = 0;
         powerUpTimeLeft = 0;
         cannonTime = 0;
@@ -206,7 +229,21 @@ public class GameCourt extends JPanel {
         shipSpeed = INIT_SHIP_SPEED;
         cannonBallSpeed = INIT_CANNONBALL_SPEED;
         direction = OrbitDirection.CW;
-        playing = true;
+        canStart = false;
+
+        repaint();
+
+        Thread startThread = new Thread((new Runnable() {
+            @Override
+            public void run() {
+                while(!canStart) {
+                    repaint();
+                }
+                playing = true;
+            }
+        }));
+        startThread.start();
+
         scoreText.setText("Score: " + score);
         invincibilityText.setText("You are not invincible");
         requestFocusInWindow();
@@ -226,8 +263,8 @@ public class GameCourt extends JPanel {
 
             List<CannonBall> toRemove = new LinkedList<>();
 
-            Set<CollectibleCircleObject> toRemoveCollectible = new TreeSet<>();
-            for (CollectibleCircleObject c : collectibles.getCollectibles()) {
+            Set<Coin> toRemoveCollectible = new TreeSet<>();
+            for (Coin c : collectibles.getCollectibles()) {
                 if (c.intersects(ship)) {
                     c.modifyState(this);
                     toRemoveCollectible.add(c);
@@ -339,7 +376,7 @@ public class GameCourt extends JPanel {
         if (Math.random() > 0.02 ) {
             double randomAngle = Math.random() * 360;
             int roundedAngle = ((int) randomAngle/10 + 5) * 10;
-            collectibles.add(Coin.createCoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
+            collectibles.add(ScoreCoin.createCoin(ORBIT_RADIUS, roundedAngle, COURT_WIDTH,
                         COURT_HEIGHT, CENTER_X, CENTER_Y));
         } else {
             double randomAngle = Math.random() * 360;
@@ -385,7 +422,7 @@ public class GameCourt extends JPanel {
 
         ship.draw(g);
 
-        for (CollectibleCircleObject c : collectibles.getCollectibles()) {
+        for (Coin c : collectibles.getCollectibles()) {
             c.draw(g);
         }
 

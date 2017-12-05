@@ -12,7 +12,6 @@ public class WordScanner implements Iterator<String> {
         r = initR;
         c = 0;
         skipNonLetters();
-        System.out.println("Done");
     }
 
     private void skipNonLetters() {
@@ -20,7 +19,6 @@ public class WordScanner implements Iterator<String> {
                 c = r.read(); // returns -1 at the end of the file
                 while (!isValidCharacter(c) && c != -1) {
                     c = r.read();
-                    System.out.println(c);
                 }
             } catch (IOException e) {
                 c = -1; // use -1 for other IOExceptions
@@ -61,7 +59,6 @@ public class WordScanner implements Iterator<String> {
             throw new NoSuchElementException();
         }
         skipNonLetters();
-        System.out.println("Here");
         return buf.toString();
     }
 

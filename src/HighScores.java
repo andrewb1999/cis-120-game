@@ -27,7 +27,6 @@ public class HighScores {
         while(in.hasNext()) {
             String w = in.next();
             int i = Integer.parseInt(in.next());
-            System.out.println(w + " " + i);
             addScore(w, i);
         }
     }
