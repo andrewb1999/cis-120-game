@@ -7,6 +7,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.*;
 import java.util.List;
@@ -45,7 +46,7 @@ public class GameCourt extends JPanel {
     private static final double INIT_SHIP_SPEED = 0.001;
     private final double INIT_CANNONBALL_SPEED = COURT_HEIGHT/2500.0;
     private static final double SHIP_SPEED_INCREASE = 0.00025;
-    private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/20000.0;
+    private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/25000.0;
 
     // the state of the game logic
     private Ship ship;
@@ -53,6 +54,7 @@ public class GameCourt extends JPanel {
     private CannonBallList cannonBalls;
     private CollectibleSet collectibles;
     private Timer gameTimer;
+    private HighScores highScores;
     private int cannonInterval;
     private double shipSpeed;
     private double cannonBallSpeed;
@@ -95,7 +97,7 @@ public class GameCourt extends JPanel {
             private boolean spaceIsPressed;
 
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_SPACE && !spaceIsPressed) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE  && !spaceIsPressed) {
                     direction = (direction == OrbitDirection.CW) ?
                             OrbitDirection.CCW : OrbitDirection.CW;
                     spaceIsPressed = true;
@@ -109,8 +111,34 @@ public class GameCourt extends JPanel {
             }
         });
 
+        addMouseListener(new MouseAdapter() {
+            private boolean mouseIsPressed;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!mouseIsPressed) {
+                    direction = (direction == OrbitDirection.CW) ?
+                            OrbitDirection.CCW : OrbitDirection.CW;
+                    mouseIsPressed = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mouseIsPressed = false;
+            }
+        });
+
         this.invincibilityText = invincibilityText;
         this.scoreText = scoreText;
+
+        try {
+            highScores = new HighScores();
+        } catch (IOException e) {
+            playing = false;
+            this.scoreText.setText("High Score File Not Found");
+        }
+
     }
 
     private class CollectibleSet {
@@ -227,6 +255,11 @@ public class GameCourt extends JPanel {
                 if (c.intersects(ship) && !isInvincible) {
                     playing = false;
                     scoreText.setText("You lose! Score: " + score);
+                    try {
+                        highScores.addScore("Andrew", score);
+                    } catch (IOException e) {
+                        scoreText.setText("High Score File Not Found");
+                    }
                 }
             }
 
@@ -242,7 +275,6 @@ public class GameCourt extends JPanel {
             }
 
             if(speedIncreaseTime >= SPEED_INCREASE_INTERVAL) {
-                System.out.println(speedIncreaseTime);
                 speedIncreaseTick();
                 speedIncreaseTime = 0;
             } else {
@@ -292,10 +324,8 @@ public class GameCourt extends JPanel {
 
     private void speedIncreaseTick() {
         if (playing) {
-            System.out.println("Here");
             if (cannonInterval > MIN_CANNON_INTERVAL) {
                 cannonInterval -= CANNON_TIME_DECREASE;
-                System.out.println(cannonInterval);
             } else {
                 cannonInterval = MIN_CANNON_INTERVAL;
             }
