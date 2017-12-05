@@ -36,15 +36,15 @@ public class GameCourt extends JPanel {
     private final int CENTER_Y = COURT_HEIGHT/2;
     private final int ORBIT_RADIUS = COURT_HEIGHT/2 - COURT_HEIGHT/8;
     private static final int INTERVAL = 1;
-    private static final int CANNON_TIME_DECREASE = 7;
+    private static final int CANNON_TIME_DECREASE = 100;
     private static final int MIN_CANNON_INTERVAL = 200;
     private static final int SPEED_INCREASE_INTERVAL = 10000;
     private static final int NEW_COIN_INTERVAL = 500;
     private static final int POWER_UP_LENGTH = 5000;
-    private static final int INIT_CANNON_INTERVAL = 2000;
-    private final double INIT_SHIP_SPEED = 0.001;
+    private static final int INIT_CANNON_INTERVAL = 1000;
+    private static final double INIT_SHIP_SPEED = 0.001;
     private final double INIT_CANNONBALL_SPEED = COURT_HEIGHT/2500.0;
-    private final double SHIP_SPEED_INCREASE = 0.00025;
+    private static final double SHIP_SPEED_INCREASE = 0.00025;
     private final double CANNONBALL_SPEED_INCREASE = COURT_HEIGHT/20000.0;
 
     // the state of the game logic
@@ -177,7 +177,6 @@ public class GameCourt extends JPanel {
         isInvincible = false;
         shipSpeed = INIT_SHIP_SPEED;
         cannonBallSpeed = INIT_CANNONBALL_SPEED;
-        cannonInterval = INIT_CANNON_INTERVAL;
         direction = OrbitDirection.CW;
         playing = true;
         scoreText.setText("Score: " + score);
@@ -235,7 +234,7 @@ public class GameCourt extends JPanel {
             ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
 
 
-            if(cannonTime++ >= cannonInterval) {
+            if(cannonTime >= cannonInterval) {
                 cannonTick();
                 cannonTime = 0;
             } else {
@@ -296,6 +295,7 @@ public class GameCourt extends JPanel {
             System.out.println("Here");
             if (cannonInterval > MIN_CANNON_INTERVAL) {
                 cannonInterval -= CANNON_TIME_DECREASE;
+                System.out.println(cannonInterval);
             } else {
                 cannonInterval = MIN_CANNON_INTERVAL;
             }
