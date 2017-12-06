@@ -19,7 +19,7 @@ public class Ship extends CircleObj {
     private static final int RADIUS_FACTOR = 40;
     private static final int INIT_X_FACTOR = 2;
     private static final int INIT_Y_FACTOR = 8;
-    private static final Color iColor = new Color(51, 204, 255);
+    private static final Color iColor = new Color(247, 136, 136);
     private static final Color nIColor = Color.BLUE;
 
     private Color color;

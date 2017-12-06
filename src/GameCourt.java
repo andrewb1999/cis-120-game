@@ -22,9 +22,11 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class GameCourt extends JPanel {
 
-    public boolean playing = false; // whether the game is running 
+    private boolean playing = false; // whether the game is running
     private JLabel scoreText; // Current status text, i.e. "Running..."
     private JLabel invincibilityText;
+    private JFormattedTextField highScoreNameInput;
+    private JLabel[] highScoreLabels;
 
     //Toolkit for determining screen resolution
     private Toolkit toolkit =  Toolkit.getDefaultToolkit ();
@@ -63,7 +65,9 @@ public class GameCourt extends JPanel {
     private int powerUpTimeLeft;
     private boolean isDoubleCoins;
     private boolean canStart;
-
+    private boolean enteredHighScore;
+    private boolean reset;
+    private String playerName;
 
     public enum OrbitDirection {
         CW (-1),
@@ -81,7 +85,8 @@ public class GameCourt extends JPanel {
 
     private OrbitDirection direction;
 
-    public GameCourt(JLabel scoreText, JLabel invincibilityText) {
+    public GameCourt(JLabel scoreText, JLabel invincibilityText, JFormattedTextField highScoreNameInput,
+                     JLabel[] highScoreLabels) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         gameTimer = new Timer();
@@ -105,8 +110,8 @@ public class GameCourt extends JPanel {
                     } else {
                         direction = (direction == OrbitDirection.CW) ?
                                 OrbitDirection.CCW : OrbitDirection.CW;
-                        spaceIsPressed = true;
                     }
+                    spaceIsPressed = true;
                 }
             }
 
@@ -139,8 +144,27 @@ public class GameCourt extends JPanel {
             }
         });
 
+        highScoreNameInput.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && highScoreNameInput.getText() != null &&
+                        !highScoreNameInput.getText().trim().equals("")) {
+                    enteredHighScore = true;
+                    playerName = highScoreNameInput.getText();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                enteredHighScore = false;
+            }
+        });
+
+        this.highScoreNameInput = highScoreNameInput;
         this.invincibilityText = invincibilityText;
         this.scoreText = scoreText;
+        this.highScoreLabels = highScoreLabels;
+
 
         try {
             highScores = new HighScores();
@@ -148,7 +172,10 @@ public class GameCourt extends JPanel {
             playing = false;
             this.scoreText.setText("High Score File Not Found");
         }
+    }
 
+    public Dimension getDim() {
+        return new Dimension(COURT_WIDTH, COURT_HEIGHT);
     }
 
     private class CollectibleSet {
@@ -159,8 +186,7 @@ public class GameCourt extends JPanel {
         }
 
         synchronized Set<Coin> getCollectibles() {
-            Set<Coin> newC = new TreeSet<>(collectibles);
-            return newC;
+            return new TreeSet<>(collectibles);
         }
 
         synchronized void add(Coin c) {
@@ -202,6 +228,7 @@ public class GameCourt extends JPanel {
      * (Re-)set the game to its initial state.
      */
     public void reset() {
+        reset = true;
         cannon = new Cannon(COURT_WIDTH, COURT_HEIGHT, COURT_WIDTH/16, COURT_WIDTH/2, COURT_HEIGHT/2);
         ship = Ship.makeShip(COURT_WIDTH, COURT_HEIGHT, CENTER_X, CENTER_Y);
         cannonBalls = new CannonBallList();
@@ -211,13 +238,15 @@ public class GameCourt extends JPanel {
         }
 
         for (Coin c : collectibles.getCollectibles()) {
-            System.out.println("Here1");
             if (c.getAngle() == 90) {
-                System.out.println("Here");
                 collectibles.remove(c);
             }
         }
 
+        enteredHighScore = false;
+        requestFocusInWindow();
+        highScoreNameInput.setVisible(false);
+        highScoreNameInput.setText("");
         playing = false;
         score = 0;
         powerUpTimeLeft = 0;
@@ -231,21 +260,22 @@ public class GameCourt extends JPanel {
         direction = OrbitDirection.CW;
         canStart = false;
 
-        repaint();
+        scoreText.setText("Press space or click to begin");
+        invincibilityText.setText("You are not invincible");
 
-        Thread startThread = new Thread((new Runnable() {
-            @Override
-            public void run() {
-                while(!canStart) {
-                    repaint();
-                }
-                playing = true;
+        Thread startThread = new Thread((() -> {
+            while(!canStart) {
+                repaint();
             }
+            playing = true;
         }));
         startThread.start();
 
-        scoreText.setText("Score: " + score);
-        invincibilityText.setText("You are not invincible");
+        String[] scores = highScores.getScores();
+
+        for (int i = 1; i < 6; i++)
+            highScoreLabels[i].setText(scores[i - 1]);
+
         requestFocusInWindow();
     }
 
@@ -260,6 +290,7 @@ public class GameCourt extends JPanel {
      */
     private void tick() {
         if (playing) {
+            reset = false;
 
             List<CannonBall> toRemove = new LinkedList<>();
 
@@ -276,7 +307,7 @@ public class GameCourt extends JPanel {
             scoreText.setText("Score: " + score);
 
             if (isInvincible) {
-                invincibilityText.setText("Invincibility left: " + powerUpTimeLeft /1000 + " seconds");
+                invincibilityText.setText("Invincibility left: " + (powerUpTimeLeft /1000 + 1) + " seconds");
             } else {
                 invincibilityText.setText("You are not invincible");
             }
@@ -291,11 +322,33 @@ public class GameCourt extends JPanel {
 
                 if (c.intersects(ship) && !isInvincible) {
                     playing = false;
-                    scoreText.setText("You lose! Score: " + score);
-                    try {
-                        highScores.addScore("Andrew", score);
-                    } catch (IOException e) {
-                        scoreText.setText("High Score File Not Found");
+                    boolean isHighScore = highScores.isHighScore(score);
+
+                    if (!isHighScore) {
+                        scoreText.setText("You lose! Score: " + score);
+                    } else {
+                        scoreText.setText("High Score of " + score + ", Please enter name:");
+                        try {
+                            highScoreNameInput.setVisible(true);
+
+                            javax.swing.Timer t = new javax.swing.Timer(100, (e -> repaint()));
+                            t.setRepeats(false);
+
+                            while (!enteredHighScore) {
+                                t.start();
+
+                                if(reset)
+                                    break;
+                            }
+
+                            t.stop();
+                            if (playerName != null)
+                                highScores.addScore(playerName, score);
+
+                            reset();
+                        } catch (IOException e) {
+                            scoreText.setText("High Score File Not Found");
+                        }
                     }
                 }
             }

@@ -1,23 +1,27 @@
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class WordScanner implements Iterator<String> {
+public class ScoreScanner implements Iterator<String> {
     private Reader r;
     private int c;
+    private boolean isName;
 
-    public WordScanner(Reader initR) {
+    public ScoreScanner(Reader initR) {
         r = initR;
         c = 0;
+        isName = true;
         skipNonLetters();
     }
 
     private void skipNonLetters() {
             try {
                 c = r.read(); // returns -1 at the end of the file
-                while (!isValidCharacter(c) && c != -1) {
+                while ((!isValidCharacter(c) || c == (int) ' ') && c != -1) {
                     c = r.read();
                 }
             } catch (IOException e) {
@@ -26,7 +30,7 @@ public class WordScanner implements Iterator<String> {
     }
 
     public static boolean isValidCharacter(int c) {
-        return c != 10 && (Character.isLetter(c) || Character.isDigit(c));
+        return c != 10 && (Character.isLetter(c) || Character.isDigit(c) || c == (int) '\"' || c == (int) ' ');
     }
 
     public static boolean isWord(String s) {
@@ -51,13 +55,33 @@ public class WordScanner implements Iterator<String> {
 
         StringWriter buf = new StringWriter();
         try {
-            while (isValidCharacter(c)) {
-                buf.write(c);
+            if (isName) {
+
+                while (c != (int) '\"') {
+                    System.out.println("Here1");
+                    c = r.read();
+                }
+
                 c = r.read();
+                while (isValidCharacter(c)) {
+                    buf.write(c);
+                    c = r.read();
+                    if (c == (int) '\"') {
+                        break;
+                    }
+
+                }
+            } else {
+                while (Character.isDigit(c)) {
+                    buf.write(c);
+                    c = r.read();
+                }
             }
         } catch (IOException e) {
             throw new NoSuchElementException();
         }
+
+        isName = !isName;
         skipNonLetters();
         return buf.toString();
     }
