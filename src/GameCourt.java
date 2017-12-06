@@ -104,6 +104,7 @@ public class GameCourt extends JPanel {
             private boolean spaceIsPressed;
 
             public void keyPressed(KeyEvent e) {
+                System.out.println("Here");
                 if (e.getKeyCode() == KeyEvent.VK_SPACE  && !spaceIsPressed) {
                     if(!canStart) {
                         canStart = true;
@@ -244,7 +245,6 @@ public class GameCourt extends JPanel {
         }
 
         enteredHighScore = false;
-        requestFocusInWindow();
         highScoreNameInput.setVisible(false);
         highScoreNameInput.setText("");
         playing = false;

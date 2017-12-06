@@ -19,12 +19,20 @@ public class Game implements Runnable {
     public void run() {
         // NOTE : recall that the 'final' keyword notes immutability even for local variables.
 
-        final JFrame introFrame = new JFrame("Corsairs");
-        introFrame.setLayout(new BorderLayout());
+        final JFrame frame = new JFrame("Corsairs");
+        frame.setLayout(new BorderLayout());
 
+        final JPanel introPanel = new JPanel();
+        introPanel.setLayout(new BorderLayout());
 
-        final JFrame gameFrame = new JFrame("Corsairs");
-        gameFrame.setLayout(new BorderLayout());
+        final JPanel gamePanel = new JPanel();
+        gamePanel.setLayout(new BorderLayout());
+
+        JPanel overlay = new JPanel();
+        overlay.setLayout( new OverlayLayout(overlay) );
+        overlay.add(introPanel, BorderLayout.CENTER); // add transparent panel first
+        overlay.add(gamePanel, BorderLayout.CENTER);
+        frame.add(overlay);
 
         //Labels
         final JLabel score = new JLabel("Score: " + 0);
@@ -39,7 +47,7 @@ public class Game implements Runnable {
 
         // Main playing area
         final JPanel game_panel = new JPanel();
-        gameFrame.add(game_panel, BorderLayout.CENTER);
+        gamePanel.add(game_panel, BorderLayout.CENTER);
         final JFormattedTextField highScoreNameInput = new JFormattedTextField();
         highScoreNameInput.addKeyListener((new KeyAdapter() {
             @Override
@@ -71,18 +79,16 @@ public class Game implements Runnable {
                 "<br><br>Press Reset to try again.</html>");
         howTo.setHorizontalAlignment(JLabel.CENTER);
         howTo.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/60));
-        introFrame.add(instructLabel, BorderLayout.NORTH);
-        introFrame.add(howTo, BorderLayout.CENTER);
-
+        introPanel.add(instructLabel, BorderLayout.NORTH);
+        introPanel.add(howTo, BorderLayout.CENTER);
         // Play button
         final JPanel play_panel = new JPanel();
-        introFrame.add(play_panel, BorderLayout.SOUTH);
+        introPanel.add(play_panel, BorderLayout.SOUTH);
         final JButton play = new JButton("Play");
         play.addActionListener(e -> {
-            Point location = introFrame.getLocationOnScreen();
-            introFrame.dispose();
-            gameFrame.setLocation(location);
-            gameFrame.setVisible(true);
+            introPanel.setVisible(false);
+            gamePanel.setVisible(true);
+            court.reset();
         });
         play.setPreferredSize(new Dimension(COURT_WIDTH/5, COURT_HEIGHT/15));
         play.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/40));
@@ -95,7 +101,7 @@ public class Game implements Runnable {
         // Status panel
         final JPanel score_panel = new JPanel();
         score_panel.setLayout(new GridLayout(2, 2));
-        gameFrame.add(score_panel, BorderLayout.SOUTH);
+        gamePanel.add(score_panel, BorderLayout.SOUTH);
         final JPanel score_inner_panel = new JPanel();
         score_inner_panel.setPreferredSize(new Dimension(COURT_WIDTH/3, COURT_HEIGHT/20));
         final JPanel invincibility_panel = new JPanel();
@@ -113,14 +119,12 @@ public class Game implements Runnable {
 
         // Main Menu button
         final JPanel main_menu_panel = new JPanel();
-        gameFrame.add(main_menu_panel, BorderLayout.NORTH);
+        gamePanel.add(main_menu_panel, BorderLayout.NORTH);
         final JButton mainMenu = new JButton("Main Menu");
         mainMenu.addActionListener(e -> {
-            Point location = gameFrame.getLocationOnScreen();
+            introPanel.setVisible(true);
+            gamePanel.setVisible(false);
             court.reset();
-            gameFrame.dispose();
-            introFrame.setLocation(location);
-            introFrame.setVisible(true);
         });
         mainMenu.setPreferredSize(new Dimension(COURT_WIDTH/5, COURT_HEIGHT/15));
         mainMenu.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/40));
@@ -130,9 +134,9 @@ public class Game implements Runnable {
         final JPanel right_panel = new JPanel();
         final JPanel left_panel = new JPanel();
         left_panel.setPreferredSize(new Dimension(COURT_HEIGHT/2, 0));
-        //gameFrame.add(left_panel, BorderLayout.WEST);
+        //gamePanel.add(left_panel, BorderLayout.WEST);
         right_panel.setLayout(new GridLayout(3, 1));
-        gameFrame.add(right_panel, BorderLayout.EAST);
+        gamePanel.add(right_panel, BorderLayout.EAST);
         final JPanel high_score_panel = new JPanel();
         high_score_panel.setLayout(new GridLayout(6, 1));
         right_panel.add(high_score_panel);
@@ -147,7 +151,7 @@ public class Game implements Runnable {
 
         // Reset button
         final JPanel control_panel = new JPanel();
-        gameFrame.add(control_panel, BorderLayout.NORTH);
+        gamePanel.add(control_panel, BorderLayout.NORTH);
         final JButton reset = new JButton("Reset");
         reset.addActionListener(e -> court.reset());
         reset.setPreferredSize(new Dimension(COURT_WIDTH/5, COURT_HEIGHT/15));
@@ -156,18 +160,16 @@ public class Game implements Runnable {
 
 
 
-        // Put the gameFrame on the screen
-        gameFrame.pack();
-        introFrame.setLocation(COURT_WIDTH/3, COURT_HEIGHT/8);
-        gameFrame.setResizable(true);
-        introFrame.setResizable(true);
-        gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        introFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        gameFrame.setVisible(false);
-        introFrame.setVisible(true);
+        // Put the gamePanel on the screen
+        frame.pack();
+        introPanel.setLocation(COURT_WIDTH/3, COURT_HEIGHT/8);
+        frame.setResizable(true);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        gamePanel.setVisible(false);
+        introPanel.setVisible(true);
 
-        introFrame.setPreferredSize(gameFrame.getPreferredSize());
-        introFrame.pack();
+        introPanel.setPreferredSize(gamePanel.getPreferredSize());
 
         // Start game
         court.reset();
