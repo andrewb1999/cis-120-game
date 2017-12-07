@@ -55,7 +55,6 @@ public class GameCourt extends JPanel {
     private Cannon cannon;
     private CannonBallList cannonBalls;
     private CollectibleSet collectibles;
-    private Timer gameTimer;
     private HighScores highScores;
     private int cannonInterval;
     private double shipSpeed;
@@ -89,7 +88,7 @@ public class GameCourt extends JPanel {
                      JLabel[] highScoreLabels) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        gameTimer = new Timer();
+        Timer gameTimer = new Timer();
         gameTimer.scheduleAtFixedRate((new TimerTask() {
             @Override
             public void run() {
@@ -342,8 +341,11 @@ public class GameCourt extends JPanel {
                             }
 
                             t.stop();
-                            if (playerName != null)
+                            if (playerName != null && playerName.length() <= 15) {
                                 highScores.addScore(playerName, score);
+                            } else if (playerName != null){
+                                highScores.addScore(playerName.substring(0, 15), score);
+                            }
 
                             reset();
                         } catch (IOException e) {
@@ -451,10 +453,12 @@ public class GameCourt extends JPanel {
     }
 
     public void incrementScore() {
-        if (isDoubleCoins) {
-            score += 2;
-        } else {
-            score++;
+        if (score < Integer.MAX_VALUE - 10) {
+            if (isDoubleCoins) {
+                score += 2;
+            } else {
+                score++;
+            }
         }
     }
 

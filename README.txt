@@ -1,6 +1,6 @@
 =:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=
 CIS 120 Game Project README
-PennKey: _______
+PennKey: butta
 =:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=:=
 
 ===================
@@ -8,7 +8,7 @@ PennKey: _______
 ===================
 
 - List the four core concepts, the features they implement, and why each feature
-  is an approprate use of the concept. Incorporate the feedback you got after
+  is an appropriate use of the concept. Incorporate the feedback you got after
   submitting your proposal.
 
   1.

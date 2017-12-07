@@ -29,7 +29,7 @@ public class ScoreScanner implements Iterator<String> {
             }
     }
 
-    public static boolean isValidCharacter(int c) {
+    private static boolean isValidCharacter(int c) {
         return c != 10 && (Character.isLetter(c) || Character.isDigit(c) || c == (int) '\"' || c == (int) ' ');
     }
 

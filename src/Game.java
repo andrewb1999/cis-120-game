@@ -134,7 +134,6 @@ public class Game implements Runnable {
         final JPanel right_panel = new JPanel();
         final JPanel left_panel = new JPanel();
         left_panel.setPreferredSize(new Dimension(COURT_HEIGHT/2, 0));
-        //gamePanel.add(left_panel, BorderLayout.WEST);
         right_panel.setLayout(new GridLayout(3, 1));
         gamePanel.add(right_panel, BorderLayout.EAST);
         final JPanel high_score_panel = new JPanel();
@@ -160,7 +159,7 @@ public class Game implements Runnable {
 
 
 
-        // Put the gamePanel on the screen
+        // Put the frame on the screen
         frame.pack();
         introPanel.setLocation(COURT_WIDTH/3, COURT_HEIGHT/8);
         frame.setResizable(true);
@@ -168,7 +167,6 @@ public class Game implements Runnable {
         frame.setVisible(true);
         gamePanel.setVisible(false);
         introPanel.setVisible(true);
-
         introPanel.setPreferredSize(gamePanel.getPreferredSize());
 
         // Start game
