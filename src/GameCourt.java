@@ -270,9 +270,12 @@ public class GameCourt extends JPanel {
         }));
         startThread.start();
 
-        String[] scores = highScores.getScores();
+        String[] scores = new String[1];
 
-        for (int i = 1; i < 6; i++)
+        if (highScores != null)
+            scores = highScores.getScores();
+
+        for (int i = 1; i < scores.length + 1; i++)
             highScoreLabels[i].setText(scores[i - 1]);
 
         requestFocusInWindow();

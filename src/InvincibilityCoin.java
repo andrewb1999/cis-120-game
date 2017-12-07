@@ -3,7 +3,6 @@ import java.awt.*;
 
 public class InvincibilityCoin extends Coin {
     private static final int COIN_RADIUS_FACTOR = 50;
-    private Color color = Color.GREEN;
     private static final String IMG_FILE = "files/coin-animation-i.gif";
     private static Image img;
 

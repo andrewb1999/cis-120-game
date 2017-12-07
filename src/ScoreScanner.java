@@ -1,5 +1,3 @@
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -19,17 +17,17 @@ public class ScoreScanner implements Iterator<String> {
     }
 
     private void skipNonLetters() {
-            try {
-                c = r.read(); // returns -1 at the end of the file
-                while ((!isValidCharacter(c) || c == (int) ' ') && c != -1) {
-                    c = r.read();
-                }
-            } catch (IOException e) {
-                c = -1; // use -1 for other IOExceptions
+        try {
+            c = r.read(); // returns -1 at the end of the file
+            while ((!isValidCharacter(c) || c == (int) ' ') && c != -1) {
+                c = r.read();
             }
+        } catch (IOException e) {
+            c = -1; // use -1 for other IOExceptions
+        }
     }
 
-    private static boolean isValidCharacter(int c) {
+    public static boolean isValidCharacter(int c) {
         return c != 10 && (Character.isLetter(c) || Character.isDigit(c) || c == (int) '\"' || c == (int) ' ');
     }
 
