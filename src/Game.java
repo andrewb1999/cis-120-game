@@ -68,7 +68,7 @@ public class Game implements Runnable {
         //Instructions Labels
         final JLabel instructLabel = new JLabel("How to Play:");
         instructLabel.setHorizontalAlignment(JLabel.CENTER);
-        instructLabel.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/40));
+        instructLabel.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/20));
         final JLabel howTo = new JLabel("<html>Corsairs is an arcade style continuous play game. " +
                 "<br><br>Press Play and then space bar or click to start the ship moving." +
                 "<br><br>Press the space bar or click to change the direction of the ship." +
@@ -78,7 +78,7 @@ public class Game implements Runnable {
                 "<br><br>Enter your name after earning a high score to save it." +
                 "<br><br>Press Reset to try again.</html>");
         howTo.setHorizontalAlignment(JLabel.CENTER);
-        howTo.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/60));
+        howTo.setFont(new Font("Dialog", Font.BOLD, COURT_HEIGHT/40));
         introPanel.add(instructLabel, BorderLayout.NORTH);
         introPanel.add(howTo, BorderLayout.CENTER);
         // Play button
