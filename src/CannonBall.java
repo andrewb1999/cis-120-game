@@ -15,20 +15,20 @@ public class CannonBall extends CircleObj {
 
     private static final Color color = Color.BLACK;
 
-    private CannonBall(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
-        super(px, py, radius, courtWidth, courtHeight);
+    private CannonBall(int px, int py, int radius, int courtSize, double angleInDegrees) {
+        super(px, py, radius, courtSize);
 
         this.angleInDegrees = angleInDegrees;
         this.initPx = getPx();
         this.initPy = getPy();
     }
 
-    public static CannonBall makeCannonBall(int courtWidth, int courtHeight, double angleInDegrees) {
-        int px = courtWidth/2 - courtWidth/RADIUS_FACTOR;
-        int py = courtHeight/2 - courtWidth/RADIUS_FACTOR;
-        int radius = courtWidth/RADIUS_FACTOR;
+    public static CannonBall makeCannonBall(int courtSize, double angleInDegrees) {
+        int px = courtSize/2 - courtSize/RADIUS_FACTOR;
+        int py = courtSize/2 - courtSize/RADIUS_FACTOR;
+        int radius = courtSize/RADIUS_FACTOR;
 
-        return new CannonBall(px, py, radius, courtHeight, courtWidth, angleInDegrees);
+        return new CannonBall(px, py, radius, courtSize, angleInDegrees);
     }
 
     public void moveAtAngle(double speed) {

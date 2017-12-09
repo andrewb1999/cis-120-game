@@ -12,27 +12,25 @@ public class InvincibilityCoin extends Coin {
      * @param px
      * @param py
      * @param radius
-     * @param courtWidth
-     * @param courtHeight
+     * @param courtSize
      * @param angleInDegrees
      */
-    private InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
-        super(px, py, radius, courtWidth, courtHeight, angleInDegrees);
+    private InvincibilityCoin(int px, int py, int radius, int courtSize, double angleInDegrees, int circleRadius,
+                      int centerX, int centerY) {
+        super(px, py, radius, courtSize, angleInDegrees, circleRadius, centerX, centerY);
 
         if (img == null) {
             img = new ImageIcon(IMG_FILE).getImage();
         }
     }
 
-    public static InvincibilityCoin createICoin(int circleRadius, double angleInDegrees, int courtWidth,
-                                  int courtHeight, int centerX, int centerY) {
-        int cx = (int) (circleRadius * Math.cos(Math.toRadians(angleInDegrees)));
-        int cy = (int) (circleRadius * Math.sin(Math.toRadians(angleInDegrees)));
-        int px = centerX + cx - courtWidth/COIN_RADIUS_FACTOR;
-        int py = centerY - cy - courtWidth/COIN_RADIUS_FACTOR;
-        int radius = courtHeight/COIN_RADIUS_FACTOR;
-
-        return new InvincibilityCoin(px, py, radius, courtWidth, courtHeight, angleInDegrees);
+    public static InvincibilityCoin createICoin(int circleRadius, double angleInDegrees, int courtSize,
+                                       int centerX, int centerY) {
+        int radius = courtSize/COIN_RADIUS_FACTOR;
+        InvincibilityCoin ic = new InvincibilityCoin(0, 0, radius, courtSize, angleInDegrees, circleRadius,
+                centerX, centerY);
+        ic.setAngle(angleInDegrees);
+        return ic;
     }
 
     @Override

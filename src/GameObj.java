@@ -12,7 +12,7 @@ import java.awt.Graphics;
  * Game objects exist in the game court. They have a position, velocity, size and bounds. Their
  * velocity controls how they move; their position should always be within their bounds.
  */
-public abstract class GameObj {
+public abstract class GameObj implements Drawable{
     /*
      * Current position of the object (in terms of graphics coordinates)
      *  
@@ -38,8 +38,7 @@ public abstract class GameObj {
     /**
      * Constructor
      */
-    public GameObj(int px, int py, int width, int height, int courtWidth,
-        int courtHeight) {
+    public GameObj(int px, int py, int width, int height, int courtSize) {
         this.px = px;
         this.py = py;
         this.width  = width;
@@ -47,8 +46,8 @@ public abstract class GameObj {
 
         // take the width and height into account when setting the bounds for the upper left corner
         // of the object.
-        this.maxX = courtWidth - width;
-        this.maxY = courtHeight - height;
+        this.maxX = courtSize - width;
+        this.maxY = courtSize - height;
     }
 
     /*** GETTERS **********************************************************************************/
@@ -109,15 +108,4 @@ public abstract class GameObj {
                 && that.px + that.width >= this.px
                 && that.py + that.height >= this.py);
     }
-
-    /**
-     * Default draw method that provides how the object should be drawn in the GUI. This method does
-     * not draw anything. Subclass should override this method based on how their object should
-     * appear.
-     * 
-     * @param g The <code>Graphics</code> context used for drawing the object. Remember graphics
-     * contexts that we used in OCaml, it gives the context in which the object should be drawn (a
-     * canvas, a frame, etc.)
-     */
-    public abstract void draw(Graphics g);
 }

@@ -12,26 +12,24 @@ public class ScoreCoin extends Coin {
      * @param px
      * @param py
      * @param radius
-     * @param courtWidth
-     * @param courtHeight
+     * @param courtSize
      */
-    private ScoreCoin(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
-        super(px, py, radius, courtWidth, courtHeight, angleInDegrees);
+    private ScoreCoin(int px, int py, int radius, int courtSize, double angleInDegrees, int circleRadius,
+                      int centerX, int centerY) {
+        super(px, py, radius, courtSize, angleInDegrees, circleRadius, centerX, centerY);
 
             if (img == null) {
                 img = new ImageIcon(IMG_FILE).getImage();
             }
     }
 
-    public static ScoreCoin createCoin(int circleRadius, double angleInDegrees, int courtWidth,
-                                       int courtHeight, int centerX, int centerY) {
-        int cx = (int) (circleRadius * Math.cos(Math.toRadians(angleInDegrees)));
-        int cy = (int) (circleRadius * Math.sin(Math.toRadians(angleInDegrees)));
-        int px = centerX + cx - courtWidth/COIN_RADIUS_FACTOR;
-        int py = centerY - cy - courtWidth/COIN_RADIUS_FACTOR;
-        int radius = courtHeight/COIN_RADIUS_FACTOR;
-
-        return new ScoreCoin(px, py, radius, courtWidth, courtHeight, angleInDegrees);
+    public static ScoreCoin createCoin(int circleRadius, double angleInDegrees, int courtSize,
+                                       int centerX, int centerY) {
+        int radius = courtSize/COIN_RADIUS_FACTOR;
+        ScoreCoin sc = new ScoreCoin(0, 0, radius, courtSize, angleInDegrees, circleRadius,
+                                        centerX, centerY);
+        sc.setAngle(angleInDegrees);
+        return sc;
     }
 
     @Override
