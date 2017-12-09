@@ -1,21 +1,21 @@
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 
 public class HighScores {
     private static final int NUM_HIGH_SCORES = 5;
     private static final int MAX_NAME_LENGTH = 20;
-    private static final String FILE_NAME = "/highScores.txt";
+    private static final String FILE_NAME = "files/highScores.txt";
     private Map<Integer, String> scores;
 
-    public HighScores() throws IOException{
+    HighScores() throws IOException {
         scores = new TreeMap<>();
-        InputStream is = Class.class.getResourceAsStream(FILE_NAME);
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        ScoreScanner sc = new ScoreScanner(br);
-        readScores(sc);
+
+        FileReader fileReader = new FileReader(FILE_NAME);
+        Reader reader = new BufferedReader(fileReader);
+        ScoreScanner in = new ScoreScanner(reader);
+        readScores(in);
+        reader.close();
+
     }
 
     public static boolean isValidName(String name) {
@@ -23,7 +23,7 @@ public class HighScores {
     }
 
     private void readScores(ScoreScanner in) throws NoSuchElementException, NumberFormatException, IOException {
-        while(in.hasNext()) {
+        while (in.hasNext()) {
             String w = in.next();
             int i = Integer.parseInt(in.next());
             addScore(w, i);
@@ -38,7 +38,7 @@ public class HighScores {
 
         int i = 0;
         for (Integer s : scoreList) {
-            output[i] = (i + 1) + ". "+ scores.get(s) + ": " + s;
+            output[i] = (i + 1) + ". " + scores.get(s) + ": " + s;
             i++;
         }
 
@@ -67,7 +67,6 @@ public class HighScores {
             }
 
 
-
             if (keySet.contains(score) && score == minValue) {
                 scores.put(score, playerName);
             } else if (score > minValue) {
@@ -76,15 +75,7 @@ public class HighScores {
             }
         }
 
-        URL resourceUrl = getClass().getResource(FILE_NAME);
-        File file = null;
-        try {
-            file = new File(resourceUrl.toURI());
-        } catch (URISyntaxException ignored) {
-        }
-        OutputStream output = new FileOutputStream(file);
-
-        Writer out = new BufferedWriter(new OutputStreamWriter(output));
+        Writer out = new BufferedWriter(new FileWriter(FILE_NAME));
         writeScores(out);
         out.close();
     }
@@ -98,7 +89,7 @@ public class HighScores {
             }
         }
 
-        if(keySet.size() == 0) {
+        if (keySet.size() == 0) {
             minValue = 0;
         }
 
@@ -114,4 +105,5 @@ public class HighScores {
             out.write("\"" + scores.get(s) + "\" " + s + "\n");
         }
     }
+
 }
