@@ -9,5 +9,5 @@ public interface CoinRing extends Iterable<Coin>{
 
     void removeCoins(Set<Coin> coins);
 
-    void removeCoinsAtAngle(int angleInDegrees);
+    void removeCoinAtAngle(int angleInDegrees);
 }

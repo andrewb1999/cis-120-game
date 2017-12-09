@@ -54,7 +54,7 @@ public class TreeSetCoinRing implements CoinRing {
     }
 
     @Override
-    public void removeCoinsAtAngle(int angleInDegrees) {
+    public void removeCoinAtAngle(int angleInDegrees) {
         Set<Coin> toRemoveCoins = new TreeSet<>();
         for (Coin c : coins) {
             if (c.getAngle() == angleInDegrees) {

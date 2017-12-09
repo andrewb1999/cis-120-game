@@ -2,7 +2,7 @@ import java.awt.*;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class CoinRingDrawable implements Drawable {
+public class CoinRingObj implements Drawable {
 
     private final int COURT_SIZE;
     private final int CENTER_X;
@@ -11,7 +11,7 @@ public class CoinRingDrawable implements Drawable {
 
     private CoinRing coinRing;
 
-    CoinRingDrawable(int courtSize, int centerX, int centerY, int orbitRadius) {
+    CoinRingObj(int courtSize, int centerX, int centerY, int orbitRadius) {
         COURT_SIZE = courtSize;
         CENTER_X = centerX;
         CENTER_Y = centerY;
@@ -21,7 +21,7 @@ public class CoinRingDrawable implements Drawable {
             addRandomCoin();
         }
 
-        coinRing.removeCoinsAtAngle(90);
+        coinRing.removeCoinAtAngle(90);
     }
 
     public synchronized void addRandomCoin() {
