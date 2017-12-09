@@ -30,9 +30,11 @@ public class GameCourt extends JPanel {
     private final int ORBIT_RADIUS = COURT_SIZE/2 - COURT_SIZE/8;
     private static final int INTERVAL = 1;
     private static final int CANNON_TIME_DECREASE = 100;
+    private static final int NEW_COIN_TIME_DECREASE = 100;
+    private static final int MIN_NEW_COIN_INTERVAL = 150;
     private static final int MIN_CANNON_INTERVAL = 200;
     private static final int SPEED_INCREASE_INTERVAL = 10000;
-    private static final int NEW_COIN_INTERVAL = 500;
+    private static final int INIT_NEW_COIN_INTERVAL = 750;
     private static final int POWER_UP_LENGTH = 5000;
     private static final int INIT_CANNON_INTERVAL = 1000;
     private static final double INIT_SHIP_SPEED = 0.001;
@@ -49,7 +51,7 @@ public class GameCourt extends JPanel {
     //Name game objects
     private Ship ship;
     private Cannon cannon;
-    private CoinRing coins;
+    private CoinRingDrawable coins;
     private HighScores highScores;
 
     // the state of the game logic
@@ -57,6 +59,7 @@ public class GameCourt extends JPanel {
     private int score;
     private int powerUpTimeLeft;
     private int cannonInterval;
+    private int newCoinInterval;
     private double shipSpeed;
     private double cannonBallSpeed;
     private boolean isInvincible;
@@ -152,7 +155,6 @@ public class GameCourt extends JPanel {
         this.scoreText = scoreText;
         this.highScoreLabels = highScoreLabels;
 
-
         try {
             highScores = new HighScores();
         } catch (IOException e) {
@@ -169,16 +171,17 @@ public class GameCourt extends JPanel {
      * (Re-)set the game to its initial state.
      */
     public void reset() {
+        //Break high score loop
         reset = true;
+
+        //Reset game objects
         cannon = new Cannon(COURT_SIZE, COURT_SIZE/16, COURT_SIZE/2,
                 COURT_SIZE/2, ORBIT_RADIUS);
         ship = Ship.makeShip(COURT_SIZE, CENTER_X, CENTER_Y);
-        coins = new CoinRing(COURT_SIZE, CENTER_X, CENTER_Y, ORBIT_RADIUS);
+        coins = new CoinRingDrawable(COURT_SIZE, CENTER_X, CENTER_Y, ORBIT_RADIUS);
 
-        //Reset Variable
+        //Reset variables
         enteredHighScore = false;
-        highScoreNameInput.setVisible(false);
-        highScoreNameInput.setText("");
         playing = false;
         score = 0;
         powerUpTimeLeft = 0;
@@ -191,10 +194,17 @@ public class GameCourt extends JPanel {
         cannonBallSpeed = INIT_CANNONBALL_SPEED;
         direction = OrbitDirection.CW;
         canStart = false;
+        newCoinInterval = INIT_NEW_COIN_INTERVAL;
 
+        //Reset Text
         scoreText.setText("Press space or click to begin");
         invincibilityText.setText("You are not invincible");
 
+        //Reset TextBox
+        highScoreNameInput.setVisible(false);
+        highScoreNameInput.setText("");
+
+        //Wait until playing
         Thread startThread = new Thread((() -> {
             while(!canStart) {
                 repaint();
@@ -203,6 +213,7 @@ public class GameCourt extends JPanel {
         }));
         startThread.start();
 
+        //Add HighScores to screen
         String[] scores = new String[1];
 
         if (highScores != null)
@@ -214,10 +225,6 @@ public class GameCourt extends JPanel {
         requestFocusInWindow();
     }
 
-
-
-
-
     /**
      * This method is called every time the timer defined in the constructor triggers.
      */
@@ -225,9 +232,9 @@ public class GameCourt extends JPanel {
         if (playing) {
             reset = false;
 
-            coins.collectCoins(ship, this);
             cannon.moveCannonBalls(cannonBallSpeed);
             ship.moveInCircle(direction, shipSpeed, ORBIT_RADIUS);
+            coins.collectCoins(ship, this);
 
             //Set text for user
             scoreText.setText("Score: " + score);
@@ -292,7 +299,7 @@ public class GameCourt extends JPanel {
             }
 
             //Timer for new coin
-            if(newCoinTime >= NEW_COIN_INTERVAL) {
+            if(newCoinTime >= newCoinInterval) {
                 coins.addRandomCoin();
                 newCoinTime = 0;
             } else {
@@ -320,6 +327,12 @@ public class GameCourt extends JPanel {
                 cannonInterval -= CANNON_TIME_DECREASE;
             } else {
                 cannonInterval = MIN_CANNON_INTERVAL;
+            }
+
+            if (newCoinInterval > MIN_NEW_COIN_INTERVAL) {
+                newCoinInterval -= NEW_COIN_TIME_DECREASE;
+            } else {
+                newCoinInterval = MIN_NEW_COIN_INTERVAL;
             }
 
             shipSpeed += SHIP_SPEED_INCREASE;
@@ -366,6 +379,7 @@ public class GameCourt extends JPanel {
         super.paintComponent(g);
         ship.draw(g);
         coins.draw(g);
+//        coins.printCoins();
         cannon.draw(g);
     }
 

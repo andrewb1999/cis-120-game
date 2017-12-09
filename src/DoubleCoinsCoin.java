@@ -15,8 +15,9 @@ public class DoubleCoinsCoin extends Coin {
      * @param radius
      * @param courtSize
      */
-    public DoubleCoinsCoin(int px, int py, int radius, int courtSize, double angleInDegrees) {
-        super(px, py, radius, courtSize, angleInDegrees);
+    private DoubleCoinsCoin(int px, int py, int radius, int courtSize, double angleInDegrees, int circleRadius,
+                      int centerX, int centerY) {
+        super(px, py, radius, courtSize, angleInDegrees, circleRadius, centerX, centerY);
 
         if (img == null) {
             img = new ImageIcon(IMG_FILE).getImage();
@@ -24,14 +25,12 @@ public class DoubleCoinsCoin extends Coin {
     }
 
     public static DoubleCoinsCoin createDCoin(int circleRadius, double angleInDegrees, int courtSize,
-                                              int centerX, int centerY) {
-        int cx = (int) (circleRadius * Math.cos(Math.toRadians(angleInDegrees)));
-        int cy = (int) (circleRadius * Math.sin(Math.toRadians(angleInDegrees)));
-        int px = centerX + cx - courtSize/COIN_RADIUS_FACTOR;
-        int py = centerY - cy - courtSize/COIN_RADIUS_FACTOR;
+                                       int centerX, int centerY) {
         int radius = courtSize/COIN_RADIUS_FACTOR;
-
-        return new DoubleCoinsCoin(px, py, radius, courtSize, angleInDegrees);
+        DoubleCoinsCoin dc = new DoubleCoinsCoin(0, 0, radius, courtSize, angleInDegrees, circleRadius,
+                centerX, centerY);
+        dc.setAngle(angleInDegrees);
+        return dc;
     }
 
     @Override
