@@ -7,15 +7,16 @@ public class InvincibilityCoin extends Coin {
     private static Image img;
 
     /**
-     * Constructor
+     * Constructor for InvincibilityCoin
      *
      * @param px
      * @param py
      * @param radius
      * @param courtWidth
      * @param courtHeight
+     * @param angleInDegrees
      */
-    public InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
+    private InvincibilityCoin(int px, int py, int radius, int courtWidth, int courtHeight, double angleInDegrees) {
         super(px, py, radius, courtWidth, courtHeight, angleInDegrees);
 
         if (img == null) {

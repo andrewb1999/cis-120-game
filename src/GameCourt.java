@@ -25,7 +25,7 @@ public class GameCourt extends JPanel {
     private boolean playing = false; // whether the game is running
     private JLabel scoreText; // Current status text, i.e. "Running..."
     private JLabel invincibilityText;
-    private JFormattedTextField highScoreNameInput;
+    private JTextField highScoreNameInput;
     private JLabel[] highScoreLabels;
 
     //Toolkit for determining screen resolution
@@ -84,7 +84,7 @@ public class GameCourt extends JPanel {
 
     private OrbitDirection direction;
 
-    public GameCourt(JLabel scoreText, JLabel invincibilityText, JFormattedTextField highScoreNameInput,
+    public GameCourt(JLabel scoreText, JLabel invincibilityText, JTextField highScoreNameInput,
                      JLabel[] highScoreLabels) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -178,6 +178,10 @@ public class GameCourt extends JPanel {
         return new Dimension(COURT_WIDTH, COURT_HEIGHT);
     }
 
+    /**
+     *  Inner Classes to synchronize access to the Collectibles Set
+     *  and CannonBall List
+     */
     private class CollectibleSet {
         private Set<Coin> collectibles;
 
@@ -347,7 +351,7 @@ public class GameCourt extends JPanel {
                             if (playerName != null && playerName.length() <= 15) {
                                 highScores.addScore(playerName, score);
                             } else if (playerName != null){
-                                highScores.addScore(playerName.substring(0, 15), score);
+                                highScores.addScore(playerName.substring(0, 16), score);
                             }
 
                             reset();
@@ -474,6 +478,19 @@ public class GameCourt extends JPanel {
     public void makeDoubleCoins() {
         isDoubleCoins = true;
         powerUpTimeLeft = POWER_UP_LENGTH;
+    }
+
+    //Test methods
+    public int getScore() {
+        return score;
+    }
+
+    public boolean getInvincibility() {
+        return isInvincible;
+    }
+
+    public boolean getDoubleCoins() {
+        return isDoubleCoins;
     }
 
     @Override

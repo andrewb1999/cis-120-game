@@ -33,7 +33,8 @@ PennKey: butta
   CollectibleObject has a method called modifyState.  Each type of coin overrides this method.
   The method is then called when the Coin is collected by the player.
 
-  4. Testable Component:
+  4. Testable Component:  I am able to test coin actions (adding, removing, modifying state) by
+  creating a Set of Coins and testing how they modify the state of the GameCourt.
 
 
 =========================
@@ -42,6 +43,13 @@ PennKey: butta
 
 - Provide an overview of each of the classes in your code, and what their
   function is in the overall game.
+
+  Swing
+  -Game: Provides the main functionality to create the game in swing.
+  Has the main method with Swing.InvokeLater()
+
+  Main Logic:
+  -
 
 
 - Were there any significant stumbling blocks while you were implementing your
