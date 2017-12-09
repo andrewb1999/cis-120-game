@@ -9,12 +9,10 @@ public abstract class Coin extends CircleObj implements CollectibleObject, Compa
      * @param px
      * @param py
      * @param radius
-     * @param courtWidth
-     * @param courtHeight
+     * @param courtSize
      */
-    public Coin(int px, int py, int radius, int courtWidth,
-                int courtHeight, double angleInDegrees) {
-        super(px, py, radius, courtWidth, courtHeight);
+    public Coin(int px, int py, int radius, int courtSize, double angleInDegrees) {
+        super(px, py, radius, courtSize);
 
         angle = angleInDegrees;
     }

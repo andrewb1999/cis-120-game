@@ -7,11 +7,10 @@ public abstract class CircleObj extends GameObj{
      * @param px
      * @param py
      * @param radius
-     * @param courtWidth
-     * @param courtHeight
+     * @param courtSize
      */
-    public CircleObj(int px, int py, int radius, int courtWidth, int courtHeight) {
-        super(px, py, radius*2, radius*2, courtWidth, courtHeight);
+    public CircleObj(int px, int py, int radius, int courtSize) {
+        super(px, py, radius*2, radius*2, courtSize);
 
         this.radius = radius;
     }

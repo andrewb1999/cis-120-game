@@ -14,8 +14,7 @@ public class Ship extends CircleObj {
     private double theta;
     private int centerX;
     private int centerY;
-    private int courtWidth;
-    private int courtHeight;
+    private int courtSize;
     private static final int RADIUS_FACTOR = 40;
     private static final int INIT_X_FACTOR = 2;
     private static final int INIT_Y_FACTOR = 8;
@@ -24,31 +23,31 @@ public class Ship extends CircleObj {
 
     private Color color;
 
-    private Ship(int px, int py, int radius, int centerX, int centerY, int courtWidth, int courtHeight) {
-        super(px, py, radius, courtWidth, courtHeight);
+    private Ship(int px, int py, int radius, int centerX, int centerY, int courtSize) {
+        super(px, py, radius, courtSize);
 
         this.centerX = centerX;
         this.centerY = centerY;
-        this.courtWidth = courtWidth;
-        this.courtHeight = courtHeight;
+        this.courtSize = courtSize;
+        this.courtSize = courtSize;
         theta = -Math.atan2(centerY - getPy(), centerX - getPx());
         color = nIColor;
     }
 
-    public static Ship makeShip(int courtWidth, int courtHeight, int centerX, int centerY) {
-        int px = courtWidth/INIT_X_FACTOR - courtWidth/RADIUS_FACTOR;
-        int py = courtHeight/INIT_Y_FACTOR - courtWidth/RADIUS_FACTOR;
-        int radius = courtWidth/RADIUS_FACTOR;
+    public static Ship makeShip(int courtSize, int centerX, int centerY) {
+        int px = courtSize /INIT_X_FACTOR - courtSize /RADIUS_FACTOR;
+        int py = courtSize /INIT_Y_FACTOR - courtSize /RADIUS_FACTOR;
+        int radius = courtSize /RADIUS_FACTOR;
 
 
-        return new Ship (px, py, radius, centerX, centerY, courtWidth, courtHeight);
+        return new Ship (px, py, radius, centerX, centerY, courtSize);
     }
 
     public double getAngleInDegrees() {
         return Math.toDegrees(-Math.atan2(centerY - getPy(), centerX - getPx())) + 180;
     }
 
-    public void moveInCircle(GameCourt.OrbitDirection direction, double speedInRadians, int radius) {
+    public void moveInCircle(OrbitDirection direction, double speedInRadians, int radius) {
         theta -= direction.getDirection() * speedInRadians;
         double x = (centerX + radius*Math.cos(theta));
         double y  = (centerY + radius*Math.sin(theta));
