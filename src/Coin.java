@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public abstract class Coin extends CircleObj implements CollectibleObject {
     private double angle;
 

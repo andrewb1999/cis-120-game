@@ -18,10 +18,6 @@ public class HighScores {
 
     }
 
-    public static boolean isValidName(String name) {
-        return name.length() < MAX_NAME_LENGTH && ScoreScanner.isWord(name);
-    }
-
     private void readScores(ScoreScanner in) throws NoSuchElementException, NumberFormatException, IOException {
         while (in.hasNext()) {
             String w = in.next();

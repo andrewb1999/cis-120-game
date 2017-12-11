@@ -25,14 +25,22 @@ public class HashSetCoinRing implements CoinRing {
         int roundedAngle = (((int) angle/10) ) * 10;
 
         if (coins.size() < 36) {
-            if (roundedAngle > 350)
-                roundedAngle = 0;
 
-            while (isAlreadyCoin(roundedAngle) || roundedAngle > 350 || roundedAngle < 0) {
-                if (Math.random() > 0.5)
-                    roundedAngle += (((int) (Math.random() * 30)/10) ) * 10;
-                else
-                    roundedAngle -= (((int) (Math.random() * 30)/10) ) * 10;
+//            boolean tooBig = false;
+
+
+
+            while(isAlreadyCoin(roundedAngle) || roundedAngle > 350 || roundedAngle < 0) {
+                while (isAlreadyCoin(roundedAngle) && roundedAngle > 350) {
+                    roundedAngle -= 10;
+                }
+
+                while (isAlreadyCoin(roundedAngle) && roundedAngle < 360) {
+                    roundedAngle += 10;
+                }
+
+                if (roundedAngle > 350)
+                    roundedAngle = 0;
 
             }
 
@@ -89,6 +97,12 @@ public class HashSetCoinRing implements CoinRing {
     public void forEach(Consumer<? super Coin> action) {
         for (Coin c : coins) {
             action.accept(c);
+
+            if (c.getAngle() > 350 || c.getAngle() < 0) {
+                coins.remove(c);
+                addCoin(c);
+            }
+
         }
     }
 

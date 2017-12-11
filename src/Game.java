@@ -5,12 +5,11 @@
  */
 
 // imports necessary libraries for Java swing
-import java.awt.*;
-import java.awt.event.*;
+
 import javax.swing.*;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * Game Main class that specifies the frame and widgets of the GUI
@@ -75,6 +74,7 @@ public class Game implements Runnable {
                 "<br><br>Collect as many coins as possible and avoid the Cannon Balls." +
                 "<br><br>Yellow coins increase your score, purple coins make you invincible" +
                 "<br>for 5 seconds and green coins gives double points for 5 seconds." +
+                "<br><br>Overtime the difficulty will increase." +
                 "<br><br>Enter your name after earning a high score to save it." +
                 "<br><br>Press Reset to try again.</html>");
         howTo.setHorizontalAlignment(JLabel.CENTER);

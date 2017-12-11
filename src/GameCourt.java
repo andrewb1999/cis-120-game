@@ -4,12 +4,15 @@
  * @date 12/8/2017
  */
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Timer;
-import java.util.*;
+import java.util.TimerTask;
 
 /**
  * GameCourt
@@ -359,19 +362,6 @@ public class GameCourt extends JPanel {
     public void makeDoubleCoins() {
         isDoubleCoins = true;
         powerUpTimeLeft = POWER_UP_LENGTH;
-    }
-
-    //Testing methods
-    public int getScore() {
-        return score;
-    }
-
-    public boolean getInvincibility() {
-        return isInvincible;
-    }
-
-    public boolean getDoubleCoins() {
-        return isDoubleCoins;
     }
 
     @Override
