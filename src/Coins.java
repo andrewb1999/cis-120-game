@@ -1,8 +1,8 @@
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
-public class CoinRingObj implements Drawable {
+public class Coins implements Drawable {
 
     private final int COURT_SIZE;
     private final int CENTER_X;
@@ -11,12 +11,12 @@ public class CoinRingObj implements Drawable {
 
     private CoinRing coinRing;
 
-    CoinRingObj(int courtSize, int centerX, int centerY, int orbitRadius) {
+    Coins(int courtSize, int centerX, int centerY, int orbitRadius) {
         COURT_SIZE = courtSize;
         CENTER_X = centerX;
         CENTER_Y = centerY;
         ORBIT_RADIUS = orbitRadius;
-        coinRing = new TreeSetCoinRing();
+        coinRing = new HashSetCoinRing();
         for (int i = 0; i < 20; i += 1) {
             addRandomCoin();
         }
@@ -42,7 +42,7 @@ public class CoinRingObj implements Drawable {
     }
 
     public synchronized void collectCoins(Ship ship, GameCourt court) {
-        Set<Coin> toRemoveCoins = new TreeSet<>();
+        Set<Coin> toRemoveCoins = new HashSet<>();
         for (Coin c : coinRing) {
             if (c.intersects(ship)) {
                 c.modifyState(court);

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class InvincibilityCoin extends Coin {
     private static final int COIN_RADIUS_FACTOR = 50;
@@ -41,5 +42,27 @@ public class InvincibilityCoin extends Coin {
     @Override
     public void draw(Graphics g) {
         g.drawImage(img, this.getPx(), this.getPy(), this.getWidth(), this.getHeight(), null);
+    }
+
+    @Override
+    public String toString() {
+        return "InvincibilityCoin " + getAngle();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InvincibilityCoin coin = (InvincibilityCoin) o;
+        return Double.compare(coin.getAngle(), getAngle()) == 0 &&
+                getCircleRadius() == coin.getCircleRadius() &&
+                getCenterX() == coin.getCenterX() &&
+                getCenterY() == coin.getCenterY();
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getAngle(), getCircleRadius(), getCenterX(), getCenterY(), this.getClass());
     }
 }

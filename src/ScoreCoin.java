@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class ScoreCoin extends Coin {
     private static final int COIN_RADIUS_FACTOR = 50;
@@ -42,5 +43,25 @@ public class ScoreCoin extends Coin {
         g.drawImage(img, this.getPx(), this.getPy(), this.getWidth(), this.getHeight(), null);
     }
 
+    @Override
+    public String toString() {
+        return "ScoreCoin " + getAngle();
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScoreCoin coin = (ScoreCoin) o;
+        return Double.compare(coin.getAngle(), getAngle()) == 0 &&
+                getCircleRadius() == coin.getCircleRadius() &&
+                getCenterX() == coin.getCenterX() &&
+                getCenterY() == coin.getCenterY();
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getAngle(), getCircleRadius(), getCenterX(), getCenterY(), this.getClass());
+    }
 }

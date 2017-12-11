@@ -51,7 +51,7 @@ public class GameCourt extends JPanel {
     //Name game objects
     private Ship ship;
     private Cannon cannon;
-    private CoinRingObj coins;
+    private Coins coins;
     private HighScores highScores;
 
     // the state of the game logic
@@ -178,7 +178,7 @@ public class GameCourt extends JPanel {
         cannon = new Cannon(COURT_SIZE, COURT_SIZE/16, COURT_SIZE/2,
                 COURT_SIZE/2, ORBIT_RADIUS);
         ship = Ship.makeShip(COURT_SIZE, CENTER_X, CENTER_Y);
-        coins = new CoinRingObj(COURT_SIZE, CENTER_X, CENTER_Y, ORBIT_RADIUS);
+        coins = new Coins(COURT_SIZE, CENTER_X, CENTER_Y, ORBIT_RADIUS);
 
         //Reset variables
         enteredHighScore = false;
@@ -379,7 +379,6 @@ public class GameCourt extends JPanel {
         super.paintComponent(g);
         ship.draw(g);
         coins.draw(g);
-//        coins.printCoins();
         cannon.draw(g);
     }
 
