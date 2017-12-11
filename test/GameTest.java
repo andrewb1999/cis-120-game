@@ -5,7 +5,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class CoinRingTest {
+public class GameTest {
     private CoinRing coinRing;
     private static final int CIRCLE_RADIUS = 100;
     private static final int COURT_SIZE = 200;
